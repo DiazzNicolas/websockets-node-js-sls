@@ -1,0 +1,2887 @@
+{
+  "/home/ubuntu/websockets-node-js-sls/serverless.yml": {
+    "versionFramework": "4.23.0",
+    "servicePath": "/home/ubuntu/websockets-node-js-sls/serverless.yml",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "org": "nicolasdiaz",
+      "service": "api-chat",
+      "provider": {
+        "name": "aws",
+        "runtime": "nodejs20.x",
+        "memorySize": 1024,
+        "timeout": 30,
+        "iam": {
+          "role": "arn:aws:iam::730872172556:role/LabRole"
+        },
+        "environment": {
+          "USERS_TABLE": "dev-t_usuarios",
+          "MESSAGES_TABLE": "dev-t_mensajes"
+        },
+        "stage": "dev",
+        "region": "us-east-1",
+        "versionFunctions": true,
+        "compiledCloudFormationTemplate": {
+          "AWSTemplateFormatVersion": "2010-09-09",
+          "Description": "The AWS CloudFormation template for this Serverless application",
+          "Resources": {
+            "CrearUsuarioLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/api-chat-dev-crearUsuario"
+              }
+            },
+            "ConnectHandlerLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/api-chat-dev-connectHandler"
+              }
+            },
+            "DisconnectHandlerLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/api-chat-dev-disconnectHandler"
+              }
+            },
+            "MessageHandlerLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/api-chat-dev-messageHandler"
+              }
+            },
+            "CrearUsuarioLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+                  "S3Key": "serverless/api-chat/dev/1762785375772-2025-11-10T14:36:15.772Z/api-chat.zip"
+                },
+                "Handler": "usuario/crear.handler",
+                "Runtime": "nodejs20.x",
+                "FunctionName": "api-chat-dev-crearUsuario",
+                "MemorySize": 1024,
+                "Timeout": 30,
+                "Environment": {
+                  "Variables": {
+                    "USERS_TABLE": "dev-t_usuarios",
+                    "MESSAGES_TABLE": "dev-t_mensajes"
+                  }
+                },
+                "Role": "arn:aws:iam::730872172556:role/LabRole"
+              },
+              "DependsOn": [
+                "CrearUsuarioLogGroup"
+              ]
+            },
+            "ConnectHandlerLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+                  "S3Key": "serverless/api-chat/dev/1762785375772-2025-11-10T14:36:15.772Z/api-chat.zip"
+                },
+                "Handler": "websocket/connect.handler",
+                "Runtime": "nodejs20.x",
+                "FunctionName": "api-chat-dev-connectHandler",
+                "MemorySize": 1024,
+                "Timeout": 30,
+                "Environment": {
+                  "Variables": {
+                    "USERS_TABLE": "dev-t_usuarios",
+                    "MESSAGES_TABLE": "dev-t_mensajes"
+                  }
+                },
+                "Role": "arn:aws:iam::730872172556:role/LabRole"
+              },
+              "DependsOn": [
+                "ConnectHandlerLogGroup"
+              ]
+            },
+            "DisconnectHandlerLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+                  "S3Key": "serverless/api-chat/dev/1762785375772-2025-11-10T14:36:15.772Z/api-chat.zip"
+                },
+                "Handler": "websocket/disconnect.handler",
+                "Runtime": "nodejs20.x",
+                "FunctionName": "api-chat-dev-disconnectHandler",
+                "MemorySize": 1024,
+                "Timeout": 30,
+                "Environment": {
+                  "Variables": {
+                    "USERS_TABLE": "dev-t_usuarios",
+                    "MESSAGES_TABLE": "dev-t_mensajes"
+                  }
+                },
+                "Role": "arn:aws:iam::730872172556:role/LabRole"
+              },
+              "DependsOn": [
+                "DisconnectHandlerLogGroup"
+              ]
+            },
+            "MessageHandlerLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+                  "S3Key": "serverless/api-chat/dev/1762785375772-2025-11-10T14:36:15.772Z/api-chat.zip"
+                },
+                "Handler": "websocket/message.handler",
+                "Runtime": "nodejs20.x",
+                "FunctionName": "api-chat-dev-messageHandler",
+                "MemorySize": 1024,
+                "Timeout": 30,
+                "Environment": {
+                  "Variables": {
+                    "USERS_TABLE": "dev-t_usuarios",
+                    "MESSAGES_TABLE": "dev-t_mensajes"
+                  }
+                },
+                "Role": "arn:aws:iam::730872172556:role/LabRole"
+              },
+              "DependsOn": [
+                "MessageHandlerLogGroup"
+              ]
+            },
+            "CrearUsuarioLambdaVersionUsgBnNEbkfHoz6notcin1gkDNdtTGbrWgNwWti8rM": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "CrearUsuarioLambdaFunction"
+                },
+                "CodeSha256": "g1nyUAgeAc6hJBHqKXOav0VJfwCVcvL8nvugEfb6iVw="
+              }
+            },
+            "ConnectHandlerLambdaVersione8qWl6Lt89BJSqcAsisiTKladCWQmAGB0HvROQzdtvU": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "ConnectHandlerLambdaFunction"
+                },
+                "CodeSha256": "g1nyUAgeAc6hJBHqKXOav0VJfwCVcvL8nvugEfb6iVw="
+              }
+            },
+            "DisconnectHandlerLambdaVersion5dvRGf0FeoZMsnPYzPKkI148sEJewZbKUqYoYAmpM": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "DisconnectHandlerLambdaFunction"
+                },
+                "CodeSha256": "g1nyUAgeAc6hJBHqKXOav0VJfwCVcvL8nvugEfb6iVw="
+              }
+            },
+            "MessageHandlerLambdaVersion49mIAIAeuRjRTrKnZA5lKhC7OzOmSWkNteqTsIydM": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "MessageHandlerLambdaFunction"
+                },
+                "CodeSha256": "g1nyUAgeAc6hJBHqKXOav0VJfwCVcvL8nvugEfb6iVw="
+              }
+            },
+            "ApiGatewayRestApi": {
+              "Type": "AWS::ApiGateway::RestApi",
+              "Properties": {
+                "Name": "dev-api-chat",
+                "EndpointConfiguration": {
+                  "Types": [
+                    "EDGE"
+                  ]
+                },
+                "Policy": ""
+              }
+            },
+            "ApiGatewayResourceUsuario": {
+              "Type": "AWS::ApiGateway::Resource",
+              "Properties": {
+                "ParentId": {
+                  "Fn::GetAtt": [
+                    "ApiGatewayRestApi",
+                    "RootResourceId"
+                  ]
+                },
+                "PathPart": "usuario",
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayResourceUsuarioCrear": {
+              "Type": "AWS::ApiGateway::Resource",
+              "Properties": {
+                "ParentId": {
+                  "Ref": "ApiGatewayResourceUsuario"
+                },
+                "PathPart": "crear",
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayMethodUsuarioCrearOptions": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "AuthorizationType": "NONE",
+                "HttpMethod": "OPTIONS",
+                "MethodResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true,
+                      "method.response.header.Access-Control-Allow-Headers": true,
+                      "method.response.header.Access-Control-Allow-Methods": true
+                    },
+                    "ResponseModels": {}
+                  }
+                ],
+                "RequestParameters": {},
+                "Integration": {
+                  "Type": "MOCK",
+                  "RequestTemplates": {
+                    "application/json": "{statusCode:200}"
+                  },
+                  "ContentHandling": "CONVERT_TO_TEXT",
+                  "IntegrationResponses": [
+                    {
+                      "StatusCode": "200",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'",
+                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+                      },
+                      "ResponseTemplates": {
+                        "application/json": ""
+                      }
+                    }
+                  ]
+                },
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceUsuarioCrear"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayMethodUsuarioCrearPost": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "HttpMethod": "POST",
+                "RequestParameters": {},
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceUsuarioCrear"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                "ApiKeyRequired": "<REDACTED>",
+                "AuthorizationType": "NONE",
+                "Integration": {
+                  "IntegrationHttpMethod": "POST",
+                  "Type": "AWS",
+                  "Uri": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition"
+                        },
+                        ":apigateway:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":lambda:path/2015-03-31/functions/",
+                        {
+                          "Fn::GetAtt": [
+                            "CrearUsuarioLambdaFunction",
+                            "Arn"
+                          ]
+                        },
+                        "/invocations"
+                      ]
+                    ]
+                  },
+                  "PassthroughBehavior": "NEVER",
+                  "RequestTemplates": {
+                    "application/json": "\n    #set( $body = $input.json(\"$\") )\n\n    \n  #define( $loop )\n    {\n    #foreach($key in $map.keySet())\n        #set( $k = $util.escapeJavaScript($key) )\n        #set( $v = $util.escapeJavaScript($map.get($key)).replaceAll(\"\\\\'\", \"'\") )\n        \"$k\":\n          \"$v\"\n          #if( $foreach.hasNext ) , #end\n    #end\n    }\n  #end\n\n  {\n    \"body\": $body,\n    \"method\": \"$context.httpMethod\",\n    \"principalId\": \"$context.authorizer.principalId\",\n    \"stage\": \"$context.stage\",\n\n    \"cognitoPoolClaims\" : {\n       \n       \"sub\": \"$context.authorizer.claims.sub\"\n    },\n\n    #set( $map = $context.authorizer )\n    \"enhancedAuthContext\": $loop,\n\n    #set( $map = $input.params().header )\n    \"headers\": $loop,\n\n    #set( $map = $input.params().querystring )\n    \"query\": $loop,\n\n    #set( $map = $input.params().path )\n    \"path\": $loop,\n\n    #set( $map = $context.identity )\n    \"identity\": $loop,\n\n    #set( $map = $stageVariables )\n    \"stageVariables\": $loop,\n\n    \"requestPath\": \"$context.resourcePath\"\n  }\n\n  ",
+                    "application/x-www-form-urlencoded": "\n    #define( $body )\n      {\n      #foreach( $token in $input.path('$').split('&') )\n        #set( $keyVal = $token.split('=') )\n        #set( $keyValSize = $keyVal.size() )\n        #if( $keyValSize >= 1 )\n          #set( $key = $util.escapeJavaScript($util.urlDecode($keyVal[0])) )\n          #if( $keyValSize >= 2 )\n            #set($val = $util.escapeJavaScript($util.urlDecode($keyVal[1])).replaceAll(\"\\\\'\",\"'\"))\n          #else\n            #set( $val = '' )\n          #end\n          \"$key\": \"$val\"#if($foreach.hasNext),#end\n        #end\n      #end\n      }\n    #end\n\n    \n  #define( $loop )\n    {\n    #foreach($key in $map.keySet())\n        #set( $k = $util.escapeJavaScript($key) )\n        #set( $v = $util.escapeJavaScript($map.get($key)).replaceAll(\"\\\\'\", \"'\") )\n        \"$k\":\n          \"$v\"\n          #if( $foreach.hasNext ) , #end\n    #end\n    }\n  #end\n\n  {\n    \"body\": $body,\n    \"method\": \"$context.httpMethod\",\n    \"principalId\": \"$context.authorizer.principalId\",\n    \"stage\": \"$context.stage\",\n\n    \"cognitoPoolClaims\" : {\n       \n       \"sub\": \"$context.authorizer.claims.sub\"\n    },\n\n    #set( $map = $context.authorizer )\n    \"enhancedAuthContext\": $loop,\n\n    #set( $map = $input.params().header )\n    \"headers\": $loop,\n\n    #set( $map = $input.params().querystring )\n    \"query\": $loop,\n\n    #set( $map = $input.params().path )\n    \"path\": $loop,\n\n    #set( $map = $context.identity )\n    \"identity\": $loop,\n\n    #set( $map = $stageVariables )\n    \"stageVariables\": $loop,\n\n    \"requestPath\": \"$context.resourcePath\"\n  }\n\n  "
+                  },
+                  "IntegrationResponses": [
+                    {
+                      "StatusCode": "200",
+                      "SelectionPattern": "",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                      },
+                      "ResponseTemplates": {}
+                    },
+                    {
+                      "StatusCode": "400",
+                      "SelectionPattern": "[\\s\\S]*\\[400\\][\\s\\S]*",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                      },
+                      "ResponseTemplates": {}
+                    },
+                    {
+                      "StatusCode": "401",
+                      "SelectionPattern": "[\\s\\S]*\\[401\\][\\s\\S]*",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                      },
+                      "ResponseTemplates": {}
+                    },
+                    {
+                      "StatusCode": "403",
+                      "SelectionPattern": "[\\s\\S]*\\[403\\][\\s\\S]*",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                      },
+                      "ResponseTemplates": {}
+                    },
+                    {
+                      "StatusCode": "404",
+                      "SelectionPattern": "[\\s\\S]*\\[404\\][\\s\\S]*",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                      },
+                      "ResponseTemplates": {}
+                    },
+                    {
+                      "StatusCode": "422",
+                      "SelectionPattern": "[\\s\\S]*\\[422\\][\\s\\S]*",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                      },
+                      "ResponseTemplates": {}
+                    },
+                    {
+                      "StatusCode": "500",
+                      "SelectionPattern": "[\\s\\S]*(Process\\s?exited\\s?before\\s?completing\\s?request|\\[500\\])[\\s\\S]*",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                      },
+                      "ResponseTemplates": {}
+                    },
+                    {
+                      "StatusCode": "502",
+                      "SelectionPattern": "[\\s\\S]*\\[502\\][\\s\\S]*",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                      },
+                      "ResponseTemplates": {}
+                    },
+                    {
+                      "StatusCode": "504",
+                      "SelectionPattern": "([\\s\\S]*\\[504\\][\\s\\S]*)|(.*Task timed out after \\d+\\.\\d+ seconds$)",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                      },
+                      "ResponseTemplates": {}
+                    }
+                  ]
+                },
+                "MethodResponses": [
+                  {
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true
+                    },
+                    "ResponseModels": {},
+                    "StatusCode": "200"
+                  },
+                  {
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true
+                    },
+                    "ResponseModels": {},
+                    "StatusCode": "400"
+                  },
+                  {
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true
+                    },
+                    "ResponseModels": {},
+                    "StatusCode": "401"
+                  },
+                  {
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true
+                    },
+                    "ResponseModels": {},
+                    "StatusCode": "403"
+                  },
+                  {
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true
+                    },
+                    "ResponseModels": {},
+                    "StatusCode": "404"
+                  },
+                  {
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true
+                    },
+                    "ResponseModels": {},
+                    "StatusCode": "422"
+                  },
+                  {
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true
+                    },
+                    "ResponseModels": {},
+                    "StatusCode": "500"
+                  },
+                  {
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true
+                    },
+                    "ResponseModels": {},
+                    "StatusCode": "502"
+                  },
+                  {
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true
+                    },
+                    "ResponseModels": {},
+                    "StatusCode": "504"
+                  }
+                ]
+              },
+              "DependsOn": [
+                "CrearUsuarioLambdaPermissionApiGateway"
+              ]
+            },
+            "ApiGatewayDeployment1762785364364": {
+              "Type": "AWS::ApiGateway::Deployment",
+              "Properties": {
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                "StageName": "dev"
+              },
+              "DependsOn": [
+                "ApiGatewayMethodUsuarioCrearOptions",
+                "ApiGatewayMethodUsuarioCrearPost"
+              ]
+            },
+            "CrearUsuarioLambdaPermissionApiGateway": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "CrearUsuarioLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "ApiGatewayRestApi"
+                      },
+                      "/*/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "WebsocketsApi": {
+              "Type": "AWS::ApiGatewayV2::Api",
+              "Properties": {
+                "Name": "dev-api-chat-websockets",
+                "RouteSelectionExpression": "$request.body.action",
+                "Description": "Serverless Websockets",
+                "ProtocolType": "WEBSOCKET"
+              }
+            },
+            "ConnectHandlerWebsocketsIntegration": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "WebsocketsApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "ConnectHandlerLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              }
+            },
+            "DisconnectHandlerWebsocketsIntegration": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "WebsocketsApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "DisconnectHandlerLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              }
+            },
+            "MessageHandlerWebsocketsIntegration": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "WebsocketsApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "MessageHandlerLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              }
+            },
+            "ConnectHandlerLambdaPermissionWebsockets": {
+              "Type": "AWS::Lambda::Permission",
+              "DependsOn": [
+                "WebsocketsApi",
+                "ConnectHandlerLambdaFunction"
+              ],
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "ConnectHandlerLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com"
+              }
+            },
+            "DisconnectHandlerLambdaPermissionWebsockets": {
+              "Type": "AWS::Lambda::Permission",
+              "DependsOn": [
+                "WebsocketsApi",
+                "DisconnectHandlerLambdaFunction"
+              ],
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "DisconnectHandlerLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com"
+              }
+            },
+            "MessageHandlerLambdaPermissionWebsockets": {
+              "Type": "AWS::Lambda::Permission",
+              "DependsOn": [
+                "WebsocketsApi",
+                "MessageHandlerLambdaFunction"
+              ],
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "MessageHandlerLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com"
+              }
+            },
+            "SconnectWebsocketsRoute": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "WebsocketsApi"
+                },
+                "RouteKey": "$connect",
+                "AuthorizationType": "NONE",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "ConnectHandlerWebsocketsIntegration"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "SdisconnectWebsocketsRoute": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "WebsocketsApi"
+                },
+                "RouteKey": "$disconnect",
+                "AuthorizationType": "NONE",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "DisconnectHandlerWebsocketsIntegration"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "sendMessageWebsocketsRoute": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "WebsocketsApi"
+                },
+                "RouteKey": "sendMessage",
+                "AuthorizationType": "NONE",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "MessageHandlerWebsocketsIntegration"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "WebsocketsDeploymentStage": {
+              "Type": "AWS::ApiGatewayV2::Stage",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "WebsocketsApi"
+                },
+                "StageName": "dev",
+                "Description": "Serverless Websockets",
+                "DeploymentId": {
+                  "Ref": "WebsocketsDeploymentNbFbmgMPSAhHg2WJjEqwAHdQuOyZDsnTXjNUtxvRFz4"
+                }
+              }
+            },
+            "WebsocketsDeploymentNbFbmgMPSAhHg2WJjEqwAHdQuOyZDsnTXjNUtxvRFz4": {
+              "Type": "AWS::ApiGatewayV2::Deployment",
+              "DependsOn": [
+                "SconnectWebsocketsRoute",
+                "SdisconnectWebsocketsRoute",
+                "sendMessageWebsocketsRoute"
+              ],
+              "Properties": {
+                "ApiId": {
+                  "Ref": "WebsocketsApi"
+                },
+                "Description": "Serverless Websockets"
+              }
+            },
+            "TablaUsuarios": {
+              "Type": "AWS::DynamoDB::Table",
+              "Properties": {
+                "TableName": "dev-t_usuarios",
+                "AttributeDefinitions": [
+                  {
+                    "AttributeName": "userId",
+                    "AttributeType": "S"
+                  }
+                ],
+                "KeySchema": [
+                  {
+                    "AttributeName": "userId",
+                    "KeyType": "HASH"
+                  }
+                ],
+                "BillingMode": "PAY_PER_REQUEST"
+              }
+            },
+            "TablaMensajes": {
+              "Type": "AWS::DynamoDB::Table",
+              "Properties": {
+                "TableName": "dev-t_mensajes",
+                "AttributeDefinitions": [
+                  {
+                    "AttributeName": "messageId",
+                    "AttributeType": "S"
+                  }
+                ],
+                "KeySchema": [
+                  {
+                    "AttributeName": "messageId",
+                    "KeyType": "HASH"
+                  }
+                ],
+                "BillingMode": "PAY_PER_REQUEST"
+              }
+            }
+          },
+          "Outputs": {
+            "ServerlessDeploymentBucketName": {
+              "Value": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+              "Export": {
+                "Name": "sls-api-chat-dev-ServerlessDeploymentBucketName"
+              }
+            },
+            "CrearUsuarioLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "CrearUsuarioLambdaVersionUsgBnNEbkfHoz6notcin1gkDNdtTGbrWgNwWti8rM"
+              },
+              "Export": {
+                "Name": "sls-api-chat-dev-CrearUsuarioLambdaFunctionQualifiedArn"
+              }
+            },
+            "ConnectHandlerLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "ConnectHandlerLambdaVersione8qWl6Lt89BJSqcAsisiTKladCWQmAGB0HvROQzdtvU"
+              },
+              "Export": {
+                "Name": "sls-api-chat-dev-ConnectHandlerLambdaFunctionQualifiedArn"
+              }
+            },
+            "DisconnectHandlerLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "DisconnectHandlerLambdaVersion5dvRGf0FeoZMsnPYzPKkI148sEJewZbKUqYoYAmpM"
+              },
+              "Export": {
+                "Name": "sls-api-chat-dev-DisconnectHandlerLambdaFunctionQualifiedArn"
+              }
+            },
+            "MessageHandlerLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "MessageHandlerLambdaVersion49mIAIAeuRjRTrKnZA5lKhC7OzOmSWkNteqTsIydM"
+              },
+              "Export": {
+                "Name": "sls-api-chat-dev-MessageHandlerLambdaFunctionQualifiedArn"
+              }
+            },
+            "ServiceEndpoint": {
+              "Description": "URL of the service endpoint",
+              "Value": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "https://",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    ".execute-api.",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ".",
+                    {
+                      "Ref": "AWS::URLSuffix"
+                    },
+                    "/dev"
+                  ]
+                ]
+              },
+              "Export": {
+                "Name": "sls-api-chat-dev-ServiceEndpoint"
+              }
+            },
+            "ServiceEndpointWebsocket": {
+              "Description": "URL of the service endpoint",
+              "Value": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "wss://",
+                    {
+                      "Ref": "WebsocketsApi"
+                    },
+                    ".execute-api.",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ".",
+                    {
+                      "Ref": "AWS::URLSuffix"
+                    },
+                    "/dev"
+                  ]
+                ]
+              },
+              "Export": {
+                "Name": "sls-api-chat-dev-ServiceEndpointWebsocket"
+              }
+            }
+          }
+        },
+        "vpc": {}
+      },
+      "functions": {
+        "crearUsuario": {
+          "handler": "usuario/crear.handler",
+          "events": [
+            {
+              "http": {
+                "path": "usuario/crear",
+                "method": "post",
+                "cors": {
+                  "origin": "*",
+                  "methods": [
+                    "OPTIONS",
+                    "POST"
+                  ],
+                  "headers": [
+                    "Content-Type",
+                    "X-Amz-Date",
+                    "Authorization",
+                    "X-Api-Key",
+                    "X-Amz-Security-Token",
+                    "X-Amz-User-Agent",
+                    "X-Amzn-Trace-Id"
+                  ],
+                  "allowCredentials": "<REDACTED>"
+                },
+                "integration": "AWS",
+                "request": {
+                  "passThrough": "NEVER"
+                },
+                "response": {
+                  "statusCodes": {
+                    "200": {
+                      "pattern": ""
+                    },
+                    "400": {
+                      "pattern": "[\\s\\S]*\\[400\\][\\s\\S]*"
+                    },
+                    "401": {
+                      "pattern": "[\\s\\S]*\\[401\\][\\s\\S]*"
+                    },
+                    "403": {
+                      "pattern": "[\\s\\S]*\\[403\\][\\s\\S]*"
+                    },
+                    "404": {
+                      "pattern": "[\\s\\S]*\\[404\\][\\s\\S]*"
+                    },
+                    "422": {
+                      "pattern": "[\\s\\S]*\\[422\\][\\s\\S]*"
+                    },
+                    "500": {
+                      "pattern": "[\\s\\S]*(Process\\s?exited\\s?before\\s?completing\\s?request|\\[500\\])[\\s\\S]*"
+                    },
+                    "502": {
+                      "pattern": "[\\s\\S]*\\[502\\][\\s\\S]*"
+                    },
+                    "504": {
+                      "pattern": "([\\s\\S]*\\[504\\][\\s\\S]*)|(.*Task timed out after \\d+\\.\\d+ seconds$)"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "name": "api-chat-dev-crearUsuario",
+          "package": {},
+          "memory": 1024,
+          "timeout": 30,
+          "runtime": "nodejs20.x",
+          "vpc": {},
+          "versionLogicalId": "CrearUsuarioLambdaVersionUsgBnNEbkfHoz6notcin1gkDNdtTGbrWgNwWti8rM"
+        },
+        "connectHandler": {
+          "handler": "websocket/connect.handler",
+          "events": [
+            {
+              "websocket": {
+                "route": "$connect"
+              }
+            }
+          ],
+          "name": "api-chat-dev-connectHandler",
+          "package": {},
+          "memory": 1024,
+          "timeout": 30,
+          "runtime": "nodejs20.x",
+          "vpc": {},
+          "versionLogicalId": "ConnectHandlerLambdaVersione8qWl6Lt89BJSqcAsisiTKladCWQmAGB0HvROQzdtvU"
+        },
+        "disconnectHandler": {
+          "handler": "websocket/disconnect.handler",
+          "events": [
+            {
+              "websocket": {
+                "route": "$disconnect"
+              }
+            }
+          ],
+          "name": "api-chat-dev-disconnectHandler",
+          "package": {},
+          "memory": 1024,
+          "timeout": 30,
+          "runtime": "nodejs20.x",
+          "vpc": {},
+          "versionLogicalId": "DisconnectHandlerLambdaVersion5dvRGf0FeoZMsnPYzPKkI148sEJewZbKUqYoYAmpM"
+        },
+        "messageHandler": {
+          "handler": "websocket/message.handler",
+          "events": [
+            {
+              "websocket": {
+                "route": "sendMessage"
+              }
+            }
+          ],
+          "name": "api-chat-dev-messageHandler",
+          "package": {},
+          "memory": 1024,
+          "timeout": 30,
+          "runtime": "nodejs20.x",
+          "vpc": {},
+          "versionLogicalId": "MessageHandlerLambdaVersion49mIAIAeuRjRTrKnZA5lKhC7OzOmSWkNteqTsIydM"
+        }
+      },
+      "resources": {
+        "Resources": {
+          "TablaUsuarios": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "dev-t_usuarios",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "userId",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "userId",
+                  "KeyType": "HASH"
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST"
+            }
+          },
+          "TablaMensajes": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "dev-t_mensajes",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "messageId",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "messageId",
+                  "KeyType": "HASH"
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST"
+            }
+          }
+        },
+        "Outputs": {}
+      }
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "nodejs20.x",
+      "memorySize": 1024,
+      "timeout": 30,
+      "iam": {
+        "role": "arn:aws:iam::730872172556:role/LabRole"
+      },
+      "environment": {
+        "USERS_TABLE": "dev-t_usuarios",
+        "MESSAGES_TABLE": "dev-t_mensajes"
+      },
+      "stage": "dev",
+      "region": "us-east-1",
+      "versionFunctions": true,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "CrearUsuarioLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/api-chat-dev-crearUsuario"
+            }
+          },
+          "ConnectHandlerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/api-chat-dev-connectHandler"
+            }
+          },
+          "DisconnectHandlerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/api-chat-dev-disconnectHandler"
+            }
+          },
+          "MessageHandlerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/api-chat-dev-messageHandler"
+            }
+          },
+          "CrearUsuarioLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+                "S3Key": "serverless/api-chat/dev/1762785375772-2025-11-10T14:36:15.772Z/api-chat.zip"
+              },
+              "Handler": "usuario/crear.handler",
+              "Runtime": "nodejs20.x",
+              "FunctionName": "api-chat-dev-crearUsuario",
+              "MemorySize": 1024,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "USERS_TABLE": "dev-t_usuarios",
+                  "MESSAGES_TABLE": "dev-t_mensajes"
+                }
+              },
+              "Role": "arn:aws:iam::730872172556:role/LabRole"
+            },
+            "DependsOn": [
+              "CrearUsuarioLogGroup"
+            ]
+          },
+          "ConnectHandlerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+                "S3Key": "serverless/api-chat/dev/1762785375772-2025-11-10T14:36:15.772Z/api-chat.zip"
+              },
+              "Handler": "websocket/connect.handler",
+              "Runtime": "nodejs20.x",
+              "FunctionName": "api-chat-dev-connectHandler",
+              "MemorySize": 1024,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "USERS_TABLE": "dev-t_usuarios",
+                  "MESSAGES_TABLE": "dev-t_mensajes"
+                }
+              },
+              "Role": "arn:aws:iam::730872172556:role/LabRole"
+            },
+            "DependsOn": [
+              "ConnectHandlerLogGroup"
+            ]
+          },
+          "DisconnectHandlerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+                "S3Key": "serverless/api-chat/dev/1762785375772-2025-11-10T14:36:15.772Z/api-chat.zip"
+              },
+              "Handler": "websocket/disconnect.handler",
+              "Runtime": "nodejs20.x",
+              "FunctionName": "api-chat-dev-disconnectHandler",
+              "MemorySize": 1024,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "USERS_TABLE": "dev-t_usuarios",
+                  "MESSAGES_TABLE": "dev-t_mensajes"
+                }
+              },
+              "Role": "arn:aws:iam::730872172556:role/LabRole"
+            },
+            "DependsOn": [
+              "DisconnectHandlerLogGroup"
+            ]
+          },
+          "MessageHandlerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+                "S3Key": "serverless/api-chat/dev/1762785375772-2025-11-10T14:36:15.772Z/api-chat.zip"
+              },
+              "Handler": "websocket/message.handler",
+              "Runtime": "nodejs20.x",
+              "FunctionName": "api-chat-dev-messageHandler",
+              "MemorySize": 1024,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "USERS_TABLE": "dev-t_usuarios",
+                  "MESSAGES_TABLE": "dev-t_mensajes"
+                }
+              },
+              "Role": "arn:aws:iam::730872172556:role/LabRole"
+            },
+            "DependsOn": [
+              "MessageHandlerLogGroup"
+            ]
+          },
+          "CrearUsuarioLambdaVersionUsgBnNEbkfHoz6notcin1gkDNdtTGbrWgNwWti8rM": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CrearUsuarioLambdaFunction"
+              },
+              "CodeSha256": "g1nyUAgeAc6hJBHqKXOav0VJfwCVcvL8nvugEfb6iVw="
+            }
+          },
+          "ConnectHandlerLambdaVersione8qWl6Lt89BJSqcAsisiTKladCWQmAGB0HvROQzdtvU": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ConnectHandlerLambdaFunction"
+              },
+              "CodeSha256": "g1nyUAgeAc6hJBHqKXOav0VJfwCVcvL8nvugEfb6iVw="
+            }
+          },
+          "DisconnectHandlerLambdaVersion5dvRGf0FeoZMsnPYzPKkI148sEJewZbKUqYoYAmpM": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "DisconnectHandlerLambdaFunction"
+              },
+              "CodeSha256": "g1nyUAgeAc6hJBHqKXOav0VJfwCVcvL8nvugEfb6iVw="
+            }
+          },
+          "MessageHandlerLambdaVersion49mIAIAeuRjRTrKnZA5lKhC7OzOmSWkNteqTsIydM": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "MessageHandlerLambdaFunction"
+              },
+              "CodeSha256": "g1nyUAgeAc6hJBHqKXOav0VJfwCVcvL8nvugEfb6iVw="
+            }
+          },
+          "ApiGatewayRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+              "Name": "dev-api-chat",
+              "EndpointConfiguration": {
+                "Types": [
+                  "EDGE"
+                ]
+              },
+              "Policy": ""
+            }
+          },
+          "ApiGatewayResourceUsuario": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "usuario",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceUsuarioCrear": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceUsuario"
+              },
+              "PathPart": "crear",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodUsuarioCrearOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceUsuarioCrear"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodUsuarioCrearPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "POST",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceUsuarioCrear"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": "<REDACTED>",
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "CrearUsuarioLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                },
+                "PassthroughBehavior": "NEVER",
+                "RequestTemplates": {
+                  "application/json": "\n    #set( $body = $input.json(\"$\") )\n\n    \n  #define( $loop )\n    {\n    #foreach($key in $map.keySet())\n        #set( $k = $util.escapeJavaScript($key) )\n        #set( $v = $util.escapeJavaScript($map.get($key)).replaceAll(\"\\\\'\", \"'\") )\n        \"$k\":\n          \"$v\"\n          #if( $foreach.hasNext ) , #end\n    #end\n    }\n  #end\n\n  {\n    \"body\": $body,\n    \"method\": \"$context.httpMethod\",\n    \"principalId\": \"$context.authorizer.principalId\",\n    \"stage\": \"$context.stage\",\n\n    \"cognitoPoolClaims\" : {\n       \n       \"sub\": \"$context.authorizer.claims.sub\"\n    },\n\n    #set( $map = $context.authorizer )\n    \"enhancedAuthContext\": $loop,\n\n    #set( $map = $input.params().header )\n    \"headers\": $loop,\n\n    #set( $map = $input.params().querystring )\n    \"query\": $loop,\n\n    #set( $map = $input.params().path )\n    \"path\": $loop,\n\n    #set( $map = $context.identity )\n    \"identity\": $loop,\n\n    #set( $map = $stageVariables )\n    \"stageVariables\": $loop,\n\n    \"requestPath\": \"$context.resourcePath\"\n  }\n\n  ",
+                  "application/x-www-form-urlencoded": "\n    #define( $body )\n      {\n      #foreach( $token in $input.path('$').split('&') )\n        #set( $keyVal = $token.split('=') )\n        #set( $keyValSize = $keyVal.size() )\n        #if( $keyValSize >= 1 )\n          #set( $key = $util.escapeJavaScript($util.urlDecode($keyVal[0])) )\n          #if( $keyValSize >= 2 )\n            #set($val = $util.escapeJavaScript($util.urlDecode($keyVal[1])).replaceAll(\"\\\\'\",\"'\"))\n          #else\n            #set( $val = '' )\n          #end\n          \"$key\": \"$val\"#if($foreach.hasNext),#end\n        #end\n      #end\n      }\n    #end\n\n    \n  #define( $loop )\n    {\n    #foreach($key in $map.keySet())\n        #set( $k = $util.escapeJavaScript($key) )\n        #set( $v = $util.escapeJavaScript($map.get($key)).replaceAll(\"\\\\'\", \"'\") )\n        \"$k\":\n          \"$v\"\n          #if( $foreach.hasNext ) , #end\n    #end\n    }\n  #end\n\n  {\n    \"body\": $body,\n    \"method\": \"$context.httpMethod\",\n    \"principalId\": \"$context.authorizer.principalId\",\n    \"stage\": \"$context.stage\",\n\n    \"cognitoPoolClaims\" : {\n       \n       \"sub\": \"$context.authorizer.claims.sub\"\n    },\n\n    #set( $map = $context.authorizer )\n    \"enhancedAuthContext\": $loop,\n\n    #set( $map = $input.params().header )\n    \"headers\": $loop,\n\n    #set( $map = $input.params().querystring )\n    \"query\": $loop,\n\n    #set( $map = $input.params().path )\n    \"path\": $loop,\n\n    #set( $map = $context.identity )\n    \"identity\": $loop,\n\n    #set( $map = $stageVariables )\n    \"stageVariables\": $loop,\n\n    \"requestPath\": \"$context.resourcePath\"\n  }\n\n  "
+                },
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "SelectionPattern": "",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'"
+                    },
+                    "ResponseTemplates": {}
+                  },
+                  {
+                    "StatusCode": "400",
+                    "SelectionPattern": "[\\s\\S]*\\[400\\][\\s\\S]*",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'"
+                    },
+                    "ResponseTemplates": {}
+                  },
+                  {
+                    "StatusCode": "401",
+                    "SelectionPattern": "[\\s\\S]*\\[401\\][\\s\\S]*",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'"
+                    },
+                    "ResponseTemplates": {}
+                  },
+                  {
+                    "StatusCode": "403",
+                    "SelectionPattern": "[\\s\\S]*\\[403\\][\\s\\S]*",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'"
+                    },
+                    "ResponseTemplates": {}
+                  },
+                  {
+                    "StatusCode": "404",
+                    "SelectionPattern": "[\\s\\S]*\\[404\\][\\s\\S]*",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'"
+                    },
+                    "ResponseTemplates": {}
+                  },
+                  {
+                    "StatusCode": "422",
+                    "SelectionPattern": "[\\s\\S]*\\[422\\][\\s\\S]*",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'"
+                    },
+                    "ResponseTemplates": {}
+                  },
+                  {
+                    "StatusCode": "500",
+                    "SelectionPattern": "[\\s\\S]*(Process\\s?exited\\s?before\\s?completing\\s?request|\\[500\\])[\\s\\S]*",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'"
+                    },
+                    "ResponseTemplates": {}
+                  },
+                  {
+                    "StatusCode": "502",
+                    "SelectionPattern": "[\\s\\S]*\\[502\\][\\s\\S]*",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'"
+                    },
+                    "ResponseTemplates": {}
+                  },
+                  {
+                    "StatusCode": "504",
+                    "SelectionPattern": "([\\s\\S]*\\[504\\][\\s\\S]*)|(.*Task timed out after \\d+\\.\\d+ seconds$)",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'"
+                    },
+                    "ResponseTemplates": {}
+                  }
+                ]
+              },
+              "MethodResponses": [
+                {
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true
+                  },
+                  "ResponseModels": {},
+                  "StatusCode": "200"
+                },
+                {
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true
+                  },
+                  "ResponseModels": {},
+                  "StatusCode": "400"
+                },
+                {
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true
+                  },
+                  "ResponseModels": {},
+                  "StatusCode": "401"
+                },
+                {
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true
+                  },
+                  "ResponseModels": {},
+                  "StatusCode": "403"
+                },
+                {
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true
+                  },
+                  "ResponseModels": {},
+                  "StatusCode": "404"
+                },
+                {
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true
+                  },
+                  "ResponseModels": {},
+                  "StatusCode": "422"
+                },
+                {
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true
+                  },
+                  "ResponseModels": {},
+                  "StatusCode": "500"
+                },
+                {
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true
+                  },
+                  "ResponseModels": {},
+                  "StatusCode": "502"
+                },
+                {
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true
+                  },
+                  "ResponseModels": {},
+                  "StatusCode": "504"
+                }
+              ]
+            },
+            "DependsOn": [
+              "CrearUsuarioLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayDeployment1762785364364": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StageName": "dev"
+            },
+            "DependsOn": [
+              "ApiGatewayMethodUsuarioCrearOptions",
+              "ApiGatewayMethodUsuarioCrearPost"
+            ]
+          },
+          "CrearUsuarioLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "CrearUsuarioLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "WebsocketsApi": {
+            "Type": "AWS::ApiGatewayV2::Api",
+            "Properties": {
+              "Name": "dev-api-chat-websockets",
+              "RouteSelectionExpression": "$request.body.action",
+              "Description": "Serverless Websockets",
+              "ProtocolType": "WEBSOCKET"
+            }
+          },
+          "ConnectHandlerWebsocketsIntegration": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "ConnectHandlerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            }
+          },
+          "DisconnectHandlerWebsocketsIntegration": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "DisconnectHandlerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            }
+          },
+          "MessageHandlerWebsocketsIntegration": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "MessageHandlerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            }
+          },
+          "ConnectHandlerLambdaPermissionWebsockets": {
+            "Type": "AWS::Lambda::Permission",
+            "DependsOn": [
+              "WebsocketsApi",
+              "ConnectHandlerLambdaFunction"
+            ],
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ConnectHandlerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com"
+            }
+          },
+          "DisconnectHandlerLambdaPermissionWebsockets": {
+            "Type": "AWS::Lambda::Permission",
+            "DependsOn": [
+              "WebsocketsApi",
+              "DisconnectHandlerLambdaFunction"
+            ],
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "DisconnectHandlerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com"
+            }
+          },
+          "MessageHandlerLambdaPermissionWebsockets": {
+            "Type": "AWS::Lambda::Permission",
+            "DependsOn": [
+              "WebsocketsApi",
+              "MessageHandlerLambdaFunction"
+            ],
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "MessageHandlerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com"
+            }
+          },
+          "SconnectWebsocketsRoute": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "RouteKey": "$connect",
+              "AuthorizationType": "NONE",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "ConnectHandlerWebsocketsIntegration"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "SdisconnectWebsocketsRoute": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "RouteKey": "$disconnect",
+              "AuthorizationType": "NONE",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "DisconnectHandlerWebsocketsIntegration"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "sendMessageWebsocketsRoute": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "RouteKey": "sendMessage",
+              "AuthorizationType": "NONE",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "MessageHandlerWebsocketsIntegration"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "WebsocketsDeploymentStage": {
+            "Type": "AWS::ApiGatewayV2::Stage",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "StageName": "dev",
+              "Description": "Serverless Websockets",
+              "DeploymentId": {
+                "Ref": "WebsocketsDeploymentNbFbmgMPSAhHg2WJjEqwAHdQuOyZDsnTXjNUtxvRFz4"
+              }
+            }
+          },
+          "WebsocketsDeploymentNbFbmgMPSAhHg2WJjEqwAHdQuOyZDsnTXjNUtxvRFz4": {
+            "Type": "AWS::ApiGatewayV2::Deployment",
+            "DependsOn": [
+              "SconnectWebsocketsRoute",
+              "SdisconnectWebsocketsRoute",
+              "sendMessageWebsocketsRoute"
+            ],
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "Description": "Serverless Websockets"
+            }
+          },
+          "TablaUsuarios": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "dev-t_usuarios",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "userId",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "userId",
+                  "KeyType": "HASH"
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST"
+            }
+          },
+          "TablaMensajes": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "dev-t_mensajes",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "messageId",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "messageId",
+                  "KeyType": "HASH"
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST"
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+            "Export": {
+              "Name": "sls-api-chat-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "CrearUsuarioLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CrearUsuarioLambdaVersionUsgBnNEbkfHoz6notcin1gkDNdtTGbrWgNwWti8rM"
+            },
+            "Export": {
+              "Name": "sls-api-chat-dev-CrearUsuarioLambdaFunctionQualifiedArn"
+            }
+          },
+          "ConnectHandlerLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ConnectHandlerLambdaVersione8qWl6Lt89BJSqcAsisiTKladCWQmAGB0HvROQzdtvU"
+            },
+            "Export": {
+              "Name": "sls-api-chat-dev-ConnectHandlerLambdaFunctionQualifiedArn"
+            }
+          },
+          "DisconnectHandlerLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "DisconnectHandlerLambdaVersion5dvRGf0FeoZMsnPYzPKkI148sEJewZbKUqYoYAmpM"
+            },
+            "Export": {
+              "Name": "sls-api-chat-dev-DisconnectHandlerLambdaFunctionQualifiedArn"
+            }
+          },
+          "MessageHandlerLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "MessageHandlerLambdaVersion49mIAIAeuRjRTrKnZA5lKhC7OzOmSWkNteqTsIydM"
+            },
+            "Export": {
+              "Name": "sls-api-chat-dev-MessageHandlerLambdaFunctionQualifiedArn"
+            }
+          },
+          "ServiceEndpoint": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/dev"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sls-api-chat-dev-ServiceEndpoint"
+            }
+          },
+          "ServiceEndpointWebsocket": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "wss://",
+                  {
+                    "Ref": "WebsocketsApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/dev"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sls-api-chat-dev-ServiceEndpointWebsocket"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "serviceRawFile": "org: nicolasdiaz\nservice: api-chat\n\nprovider:\n  name: aws\n  runtime: nodejs20.x\n  memorySize: 1024\n  timeout: 30\n  iam:\n    role: arn:aws:iam::730872172556:role/LabRole\n  environment:\n    USERS_TABLE: ${sls:stage}-t_usuarios\n    MESSAGES_TABLE: ${sls:stage}-t_mensajes\n\n# ==========================================================\n# 🧠 FUNCIONES HTTP (usuarios)\n# ==========================================================\nfunctions:\n  crearUsuario:\n    handler: usuario/crear.handler\n    events:\n      - http:\n          path: /usuario/crear\n          method: post\n          cors: true\n          integration: lambda\n\n# ==========================================================\n# FUNCIONES WEBSOCKET\n# ==========================================================\n  connectHandler:\n    handler: websocket/connect.handler\n    events:\n      - websocket:\n          route: $connect\n\n  disconnectHandler:\n    handler: websocket/disconnect.handler\n    events:\n      - websocket:\n          route: $disconnect\n\n  messageHandler:\n    handler: websocket/message.handler\n    events:\n      - websocket:\n          route: sendMessage\n\n# ==========================================================\n# RECURSOS (DynamoDB)\n# ==========================================================\nresources:\n  Resources:\n    TablaUsuarios:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${self:provider.environment.USERS_TABLE}\n        AttributeDefinitions:\n          - AttributeName: userId\n            AttributeType: S\n        KeySchema:\n          - AttributeName: userId\n            KeyType: HASH\n        BillingMode: PAY_PER_REQUEST\n\n    TablaMensajes:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${self:provider.environment.MESSAGES_TABLE}\n        AttributeDefinitions:\n          - AttributeName: messageId\n            AttributeType: S\n        KeySchema:\n          - AttributeName: messageId\n            KeyType: HASH\n        BillingMode: PAY_PER_REQUEST\n",
+    "command": [
+      "deploy"
+    ],
+    "options": {
+      "stage": "dev"
+    },
+    "orgId": "a0e48ac3-2c7e-4f93-a7e7-4d939a32d23a",
+    "orgName": "nicolasdiaz",
+    "userId": "6tFPS9xj8nDjg8L2H1",
+    "userName": "nicolasdiaz",
+    "serviceProviderAwsAccountId": "730872172556",
+    "serviceProviderAwsCfStackName": "api-chat-dev",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:730872172556:stack/api-chat-dev/9e18a6a0-be42-11f0-a8d9-0affc7332cdd",
+    "serviceProviderAwsCfStackCreated": "2025-11-10T14:36:17.943Z",
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": "CREATE_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "ConnectHandlerLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:730872172556:function:api-chat-dev-connectHandler:1",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-api-chat-dev-ConnectHandlerLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "MessageHandlerLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:730872172556:function:api-chat-dev-messageHandler:1",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-api-chat-dev-MessageHandlerLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "DisconnectHandlerLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:730872172556:function:api-chat-dev-disconnectHandler:1",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-api-chat-dev-DisconnectHandlerLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "CrearUsuarioLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:730872172556:function:api-chat-dev-crearUsuario:1",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-api-chat-dev-CrearUsuarioLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "ServiceEndpoint",
+        "OutputValue": "https://ae85lhsnz9.execute-api.us-east-1.amazonaws.com/dev",
+        "Description": "URL of the service endpoint",
+        "ExportName": "sls-api-chat-dev-ServiceEndpoint"
+      },
+      {
+        "OutputKey": "ServiceEndpointWebsocket",
+        "OutputValue": "wss://ql8to9jft0.execute-api.us-east-1.amazonaws.com/dev",
+        "Description": "URL of the service endpoint",
+        "ExportName": "sls-api-chat-dev-ServiceEndpointWebsocket"
+      },
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+        "ExportName": "sls-api-chat-dev-ServerlessDeploymentBucketName"
+      }
+    ],
+    "compiledCloudFormationTemplate": {
+      "AWSTemplateFormatVersion": "2010-09-09",
+      "Description": "The AWS CloudFormation template for this Serverless application",
+      "Resources": {
+        "CrearUsuarioLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/api-chat-dev-crearUsuario"
+          }
+        },
+        "ConnectHandlerLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/api-chat-dev-connectHandler"
+          }
+        },
+        "DisconnectHandlerLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/api-chat-dev-disconnectHandler"
+          }
+        },
+        "MessageHandlerLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/api-chat-dev-messageHandler"
+          }
+        },
+        "CrearUsuarioLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+              "S3Key": "serverless/api-chat/dev/1762785375772-2025-11-10T14:36:15.772Z/api-chat.zip"
+            },
+            "Handler": "usuario/crear.handler",
+            "Runtime": "nodejs20.x",
+            "FunctionName": "api-chat-dev-crearUsuario",
+            "MemorySize": 1024,
+            "Timeout": 30,
+            "Environment": {
+              "Variables": {
+                "USERS_TABLE": "dev-t_usuarios",
+                "MESSAGES_TABLE": "dev-t_mensajes"
+              }
+            },
+            "Role": "arn:aws:iam::730872172556:role/LabRole"
+          },
+          "DependsOn": [
+            "CrearUsuarioLogGroup"
+          ]
+        },
+        "ConnectHandlerLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+              "S3Key": "serverless/api-chat/dev/1762785375772-2025-11-10T14:36:15.772Z/api-chat.zip"
+            },
+            "Handler": "websocket/connect.handler",
+            "Runtime": "nodejs20.x",
+            "FunctionName": "api-chat-dev-connectHandler",
+            "MemorySize": 1024,
+            "Timeout": 30,
+            "Environment": {
+              "Variables": {
+                "USERS_TABLE": "dev-t_usuarios",
+                "MESSAGES_TABLE": "dev-t_mensajes"
+              }
+            },
+            "Role": "arn:aws:iam::730872172556:role/LabRole"
+          },
+          "DependsOn": [
+            "ConnectHandlerLogGroup"
+          ]
+        },
+        "DisconnectHandlerLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+              "S3Key": "serverless/api-chat/dev/1762785375772-2025-11-10T14:36:15.772Z/api-chat.zip"
+            },
+            "Handler": "websocket/disconnect.handler",
+            "Runtime": "nodejs20.x",
+            "FunctionName": "api-chat-dev-disconnectHandler",
+            "MemorySize": 1024,
+            "Timeout": 30,
+            "Environment": {
+              "Variables": {
+                "USERS_TABLE": "dev-t_usuarios",
+                "MESSAGES_TABLE": "dev-t_mensajes"
+              }
+            },
+            "Role": "arn:aws:iam::730872172556:role/LabRole"
+          },
+          "DependsOn": [
+            "DisconnectHandlerLogGroup"
+          ]
+        },
+        "MessageHandlerLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+              "S3Key": "serverless/api-chat/dev/1762785375772-2025-11-10T14:36:15.772Z/api-chat.zip"
+            },
+            "Handler": "websocket/message.handler",
+            "Runtime": "nodejs20.x",
+            "FunctionName": "api-chat-dev-messageHandler",
+            "MemorySize": 1024,
+            "Timeout": 30,
+            "Environment": {
+              "Variables": {
+                "USERS_TABLE": "dev-t_usuarios",
+                "MESSAGES_TABLE": "dev-t_mensajes"
+              }
+            },
+            "Role": "arn:aws:iam::730872172556:role/LabRole"
+          },
+          "DependsOn": [
+            "MessageHandlerLogGroup"
+          ]
+        },
+        "CrearUsuarioLambdaVersionUsgBnNEbkfHoz6notcin1gkDNdtTGbrWgNwWti8rM": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "CrearUsuarioLambdaFunction"
+            },
+            "CodeSha256": "g1nyUAgeAc6hJBHqKXOav0VJfwCVcvL8nvugEfb6iVw="
+          }
+        },
+        "ConnectHandlerLambdaVersione8qWl6Lt89BJSqcAsisiTKladCWQmAGB0HvROQzdtvU": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "ConnectHandlerLambdaFunction"
+            },
+            "CodeSha256": "g1nyUAgeAc6hJBHqKXOav0VJfwCVcvL8nvugEfb6iVw="
+          }
+        },
+        "DisconnectHandlerLambdaVersion5dvRGf0FeoZMsnPYzPKkI148sEJewZbKUqYoYAmpM": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "DisconnectHandlerLambdaFunction"
+            },
+            "CodeSha256": "g1nyUAgeAc6hJBHqKXOav0VJfwCVcvL8nvugEfb6iVw="
+          }
+        },
+        "MessageHandlerLambdaVersion49mIAIAeuRjRTrKnZA5lKhC7OzOmSWkNteqTsIydM": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "MessageHandlerLambdaFunction"
+            },
+            "CodeSha256": "g1nyUAgeAc6hJBHqKXOav0VJfwCVcvL8nvugEfb6iVw="
+          }
+        },
+        "ApiGatewayRestApi": {
+          "Type": "AWS::ApiGateway::RestApi",
+          "Properties": {
+            "Name": "dev-api-chat",
+            "EndpointConfiguration": {
+              "Types": [
+                "EDGE"
+              ]
+            },
+            "Policy": ""
+          }
+        },
+        "ApiGatewayResourceUsuario": {
+          "Type": "AWS::ApiGateway::Resource",
+          "Properties": {
+            "ParentId": {
+              "Fn::GetAtt": [
+                "ApiGatewayRestApi",
+                "RootResourceId"
+              ]
+            },
+            "PathPart": "usuario",
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayResourceUsuarioCrear": {
+          "Type": "AWS::ApiGateway::Resource",
+          "Properties": {
+            "ParentId": {
+              "Ref": "ApiGatewayResourceUsuario"
+            },
+            "PathPart": "crear",
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayMethodUsuarioCrearOptions": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "AuthorizationType": "NONE",
+            "HttpMethod": "OPTIONS",
+            "MethodResponses": [
+              {
+                "StatusCode": "200",
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true,
+                  "method.response.header.Access-Control-Allow-Headers": true,
+                  "method.response.header.Access-Control-Allow-Methods": true
+                },
+                "ResponseModels": {}
+              }
+            ],
+            "RequestParameters": {},
+            "Integration": {
+              "Type": "MOCK",
+              "RequestTemplates": {
+                "application/json": "{statusCode:200}"
+              },
+              "ContentHandling": "CONVERT_TO_TEXT",
+              "IntegrationResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'",
+                    "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                    "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+                  },
+                  "ResponseTemplates": {
+                    "application/json": ""
+                  }
+                }
+              ]
+            },
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceUsuarioCrear"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayMethodUsuarioCrearPost": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "HttpMethod": "POST",
+            "RequestParameters": {},
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceUsuarioCrear"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "ApiKeyRequired": "<REDACTED>",
+            "AuthorizationType": "NONE",
+            "Integration": {
+              "IntegrationHttpMethod": "POST",
+              "Type": "AWS",
+              "Uri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "CrearUsuarioLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              },
+              "PassthroughBehavior": "NEVER",
+              "RequestTemplates": {
+                "application/json": "\n    #set( $body = $input.json(\"$\") )\n\n    \n  #define( $loop )\n    {\n    #foreach($key in $map.keySet())\n        #set( $k = $util.escapeJavaScript($key) )\n        #set( $v = $util.escapeJavaScript($map.get($key)).replaceAll(\"\\\\'\", \"'\") )\n        \"$k\":\n          \"$v\"\n          #if( $foreach.hasNext ) , #end\n    #end\n    }\n  #end\n\n  {\n    \"body\": $body,\n    \"method\": \"$context.httpMethod\",\n    \"principalId\": \"$context.authorizer.principalId\",\n    \"stage\": \"$context.stage\",\n\n    \"cognitoPoolClaims\" : {\n       \n       \"sub\": \"$context.authorizer.claims.sub\"\n    },\n\n    #set( $map = $context.authorizer )\n    \"enhancedAuthContext\": $loop,\n\n    #set( $map = $input.params().header )\n    \"headers\": $loop,\n\n    #set( $map = $input.params().querystring )\n    \"query\": $loop,\n\n    #set( $map = $input.params().path )\n    \"path\": $loop,\n\n    #set( $map = $context.identity )\n    \"identity\": $loop,\n\n    #set( $map = $stageVariables )\n    \"stageVariables\": $loop,\n\n    \"requestPath\": \"$context.resourcePath\"\n  }\n\n  ",
+                "application/x-www-form-urlencoded": "\n    #define( $body )\n      {\n      #foreach( $token in $input.path('$').split('&') )\n        #set( $keyVal = $token.split('=') )\n        #set( $keyValSize = $keyVal.size() )\n        #if( $keyValSize >= 1 )\n          #set( $key = $util.escapeJavaScript($util.urlDecode($keyVal[0])) )\n          #if( $keyValSize >= 2 )\n            #set($val = $util.escapeJavaScript($util.urlDecode($keyVal[1])).replaceAll(\"\\\\'\",\"'\"))\n          #else\n            #set( $val = '' )\n          #end\n          \"$key\": \"$val\"#if($foreach.hasNext),#end\n        #end\n      #end\n      }\n    #end\n\n    \n  #define( $loop )\n    {\n    #foreach($key in $map.keySet())\n        #set( $k = $util.escapeJavaScript($key) )\n        #set( $v = $util.escapeJavaScript($map.get($key)).replaceAll(\"\\\\'\", \"'\") )\n        \"$k\":\n          \"$v\"\n          #if( $foreach.hasNext ) , #end\n    #end\n    }\n  #end\n\n  {\n    \"body\": $body,\n    \"method\": \"$context.httpMethod\",\n    \"principalId\": \"$context.authorizer.principalId\",\n    \"stage\": \"$context.stage\",\n\n    \"cognitoPoolClaims\" : {\n       \n       \"sub\": \"$context.authorizer.claims.sub\"\n    },\n\n    #set( $map = $context.authorizer )\n    \"enhancedAuthContext\": $loop,\n\n    #set( $map = $input.params().header )\n    \"headers\": $loop,\n\n    #set( $map = $input.params().querystring )\n    \"query\": $loop,\n\n    #set( $map = $input.params().path )\n    \"path\": $loop,\n\n    #set( $map = $context.identity )\n    \"identity\": $loop,\n\n    #set( $map = $stageVariables )\n    \"stageVariables\": $loop,\n\n    \"requestPath\": \"$context.resourcePath\"\n  }\n\n  "
+              },
+              "IntegrationResponses": [
+                {
+                  "StatusCode": "200",
+                  "SelectionPattern": "",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'"
+                  },
+                  "ResponseTemplates": {}
+                },
+                {
+                  "StatusCode": "400",
+                  "SelectionPattern": "[\\s\\S]*\\[400\\][\\s\\S]*",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'"
+                  },
+                  "ResponseTemplates": {}
+                },
+                {
+                  "StatusCode": "401",
+                  "SelectionPattern": "[\\s\\S]*\\[401\\][\\s\\S]*",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'"
+                  },
+                  "ResponseTemplates": {}
+                },
+                {
+                  "StatusCode": "403",
+                  "SelectionPattern": "[\\s\\S]*\\[403\\][\\s\\S]*",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'"
+                  },
+                  "ResponseTemplates": {}
+                },
+                {
+                  "StatusCode": "404",
+                  "SelectionPattern": "[\\s\\S]*\\[404\\][\\s\\S]*",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'"
+                  },
+                  "ResponseTemplates": {}
+                },
+                {
+                  "StatusCode": "422",
+                  "SelectionPattern": "[\\s\\S]*\\[422\\][\\s\\S]*",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'"
+                  },
+                  "ResponseTemplates": {}
+                },
+                {
+                  "StatusCode": "500",
+                  "SelectionPattern": "[\\s\\S]*(Process\\s?exited\\s?before\\s?completing\\s?request|\\[500\\])[\\s\\S]*",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'"
+                  },
+                  "ResponseTemplates": {}
+                },
+                {
+                  "StatusCode": "502",
+                  "SelectionPattern": "[\\s\\S]*\\[502\\][\\s\\S]*",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'"
+                  },
+                  "ResponseTemplates": {}
+                },
+                {
+                  "StatusCode": "504",
+                  "SelectionPattern": "([\\s\\S]*\\[504\\][\\s\\S]*)|(.*Task timed out after \\d+\\.\\d+ seconds$)",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'"
+                  },
+                  "ResponseTemplates": {}
+                }
+              ]
+            },
+            "MethodResponses": [
+              {
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true
+                },
+                "ResponseModels": {},
+                "StatusCode": "200"
+              },
+              {
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true
+                },
+                "ResponseModels": {},
+                "StatusCode": "400"
+              },
+              {
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true
+                },
+                "ResponseModels": {},
+                "StatusCode": "401"
+              },
+              {
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true
+                },
+                "ResponseModels": {},
+                "StatusCode": "403"
+              },
+              {
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true
+                },
+                "ResponseModels": {},
+                "StatusCode": "404"
+              },
+              {
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true
+                },
+                "ResponseModels": {},
+                "StatusCode": "422"
+              },
+              {
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true
+                },
+                "ResponseModels": {},
+                "StatusCode": "500"
+              },
+              {
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true
+                },
+                "ResponseModels": {},
+                "StatusCode": "502"
+              },
+              {
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true
+                },
+                "ResponseModels": {},
+                "StatusCode": "504"
+              }
+            ]
+          },
+          "DependsOn": [
+            "CrearUsuarioLambdaPermissionApiGateway"
+          ]
+        },
+        "ApiGatewayDeployment1762785364364": {
+          "Type": "AWS::ApiGateway::Deployment",
+          "Properties": {
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "StageName": "dev"
+          },
+          "DependsOn": [
+            "ApiGatewayMethodUsuarioCrearOptions",
+            "ApiGatewayMethodUsuarioCrearPost"
+          ]
+        },
+        "CrearUsuarioLambdaPermissionApiGateway": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "CrearUsuarioLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  "/*/*"
+                ]
+              ]
+            }
+          }
+        },
+        "WebsocketsApi": {
+          "Type": "AWS::ApiGatewayV2::Api",
+          "Properties": {
+            "Name": "dev-api-chat-websockets",
+            "RouteSelectionExpression": "$request.body.action",
+            "Description": "Serverless Websockets",
+            "ProtocolType": "WEBSOCKET"
+          }
+        },
+        "ConnectHandlerWebsocketsIntegration": {
+          "Type": "AWS::ApiGatewayV2::Integration",
+          "Properties": {
+            "ApiId": {
+              "Ref": "WebsocketsApi"
+            },
+            "IntegrationType": "AWS_PROXY",
+            "IntegrationUri": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":apigateway:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":lambda:path/2015-03-31/functions/",
+                  {
+                    "Fn::GetAtt": [
+                      "ConnectHandlerLambdaFunction",
+                      "Arn"
+                    ]
+                  },
+                  "/invocations"
+                ]
+              ]
+            }
+          }
+        },
+        "DisconnectHandlerWebsocketsIntegration": {
+          "Type": "AWS::ApiGatewayV2::Integration",
+          "Properties": {
+            "ApiId": {
+              "Ref": "WebsocketsApi"
+            },
+            "IntegrationType": "AWS_PROXY",
+            "IntegrationUri": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":apigateway:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":lambda:path/2015-03-31/functions/",
+                  {
+                    "Fn::GetAtt": [
+                      "DisconnectHandlerLambdaFunction",
+                      "Arn"
+                    ]
+                  },
+                  "/invocations"
+                ]
+              ]
+            }
+          }
+        },
+        "MessageHandlerWebsocketsIntegration": {
+          "Type": "AWS::ApiGatewayV2::Integration",
+          "Properties": {
+            "ApiId": {
+              "Ref": "WebsocketsApi"
+            },
+            "IntegrationType": "AWS_PROXY",
+            "IntegrationUri": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":apigateway:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":lambda:path/2015-03-31/functions/",
+                  {
+                    "Fn::GetAtt": [
+                      "MessageHandlerLambdaFunction",
+                      "Arn"
+                    ]
+                  },
+                  "/invocations"
+                ]
+              ]
+            }
+          }
+        },
+        "ConnectHandlerLambdaPermissionWebsockets": {
+          "Type": "AWS::Lambda::Permission",
+          "DependsOn": [
+            "WebsocketsApi",
+            "ConnectHandlerLambdaFunction"
+          ],
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "ConnectHandlerLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com"
+          }
+        },
+        "DisconnectHandlerLambdaPermissionWebsockets": {
+          "Type": "AWS::Lambda::Permission",
+          "DependsOn": [
+            "WebsocketsApi",
+            "DisconnectHandlerLambdaFunction"
+          ],
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "DisconnectHandlerLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com"
+          }
+        },
+        "MessageHandlerLambdaPermissionWebsockets": {
+          "Type": "AWS::Lambda::Permission",
+          "DependsOn": [
+            "WebsocketsApi",
+            "MessageHandlerLambdaFunction"
+          ],
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "MessageHandlerLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com"
+          }
+        },
+        "SconnectWebsocketsRoute": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "WebsocketsApi"
+            },
+            "RouteKey": "$connect",
+            "AuthorizationType": "NONE",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "ConnectHandlerWebsocketsIntegration"
+                  }
+                ]
+              ]
+            }
+          }
+        },
+        "SdisconnectWebsocketsRoute": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "WebsocketsApi"
+            },
+            "RouteKey": "$disconnect",
+            "AuthorizationType": "NONE",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "DisconnectHandlerWebsocketsIntegration"
+                  }
+                ]
+              ]
+            }
+          }
+        },
+        "sendMessageWebsocketsRoute": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "WebsocketsApi"
+            },
+            "RouteKey": "sendMessage",
+            "AuthorizationType": "NONE",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "MessageHandlerWebsocketsIntegration"
+                  }
+                ]
+              ]
+            }
+          }
+        },
+        "WebsocketsDeploymentStage": {
+          "Type": "AWS::ApiGatewayV2::Stage",
+          "Properties": {
+            "ApiId": {
+              "Ref": "WebsocketsApi"
+            },
+            "StageName": "dev",
+            "Description": "Serverless Websockets",
+            "DeploymentId": {
+              "Ref": "WebsocketsDeploymentNbFbmgMPSAhHg2WJjEqwAHdQuOyZDsnTXjNUtxvRFz4"
+            }
+          }
+        },
+        "WebsocketsDeploymentNbFbmgMPSAhHg2WJjEqwAHdQuOyZDsnTXjNUtxvRFz4": {
+          "Type": "AWS::ApiGatewayV2::Deployment",
+          "DependsOn": [
+            "SconnectWebsocketsRoute",
+            "SdisconnectWebsocketsRoute",
+            "sendMessageWebsocketsRoute"
+          ],
+          "Properties": {
+            "ApiId": {
+              "Ref": "WebsocketsApi"
+            },
+            "Description": "Serverless Websockets"
+          }
+        },
+        "TablaUsuarios": {
+          "Type": "AWS::DynamoDB::Table",
+          "Properties": {
+            "TableName": "dev-t_usuarios",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "userId",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "userId",
+                "KeyType": "HASH"
+              }
+            ],
+            "BillingMode": "PAY_PER_REQUEST"
+          }
+        },
+        "TablaMensajes": {
+          "Type": "AWS::DynamoDB::Table",
+          "Properties": {
+            "TableName": "dev-t_mensajes",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "messageId",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "messageId",
+                "KeyType": "HASH"
+              }
+            ],
+            "BillingMode": "PAY_PER_REQUEST"
+          }
+        }
+      },
+      "Outputs": {
+        "ServerlessDeploymentBucketName": {
+          "Value": "serverless-framework-deployments-us-east-1-9e4c378a-42d9",
+          "Export": {
+            "Name": "sls-api-chat-dev-ServerlessDeploymentBucketName"
+          }
+        },
+        "CrearUsuarioLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "CrearUsuarioLambdaVersionUsgBnNEbkfHoz6notcin1gkDNdtTGbrWgNwWti8rM"
+          },
+          "Export": {
+            "Name": "sls-api-chat-dev-CrearUsuarioLambdaFunctionQualifiedArn"
+          }
+        },
+        "ConnectHandlerLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "ConnectHandlerLambdaVersione8qWl6Lt89BJSqcAsisiTKladCWQmAGB0HvROQzdtvU"
+          },
+          "Export": {
+            "Name": "sls-api-chat-dev-ConnectHandlerLambdaFunctionQualifiedArn"
+          }
+        },
+        "DisconnectHandlerLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "DisconnectHandlerLambdaVersion5dvRGf0FeoZMsnPYzPKkI148sEJewZbKUqYoYAmpM"
+          },
+          "Export": {
+            "Name": "sls-api-chat-dev-DisconnectHandlerLambdaFunctionQualifiedArn"
+          }
+        },
+        "MessageHandlerLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "MessageHandlerLambdaVersion49mIAIAeuRjRTrKnZA5lKhC7OzOmSWkNteqTsIydM"
+          },
+          "Export": {
+            "Name": "sls-api-chat-dev-MessageHandlerLambdaFunctionQualifiedArn"
+          }
+        },
+        "ServiceEndpoint": {
+          "Description": "URL of the service endpoint",
+          "Value": {
+            "Fn::Join": [
+              "",
+              [
+                "https://",
+                {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                ".execute-api.",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ".",
+                {
+                  "Ref": "AWS::URLSuffix"
+                },
+                "/dev"
+              ]
+            ]
+          },
+          "Export": {
+            "Name": "sls-api-chat-dev-ServiceEndpoint"
+          }
+        },
+        "ServiceEndpointWebsocket": {
+          "Description": "URL of the service endpoint",
+          "Value": {
+            "Fn::Join": [
+              "",
+              [
+                "wss://",
+                {
+                  "Ref": "WebsocketsApi"
+                },
+                ".execute-api.",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ".",
+                {
+                  "Ref": "AWS::URLSuffix"
+                },
+                "/dev"
+              ]
+            ]
+          },
+          "Export": {
+            "Name": "sls-api-chat-dev-ServiceEndpointWebsocket"
+          }
+        }
+      }
+    }
+  }
+}
