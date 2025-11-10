@@ -1,5 +1,4 @@
 org: nicolasdiaz
-app: api-chat
 service: api-chat
 
 provider:
@@ -11,18 +10,11 @@ provider:
   iam:
     role: arn:aws:iam::730872172556:role/LabRole
   environment:
-    USERS_TABLE: ${self:custom.stage}-t_usuarios
-    MESSAGES_TABLE: ${self:custom.stage}-t_mensajes
-    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
-    WEBSOCKET_API: !Sub "https://${WebsocketsApi}.execute-api.${AWS::Region}.amazonaws.com/${self:custom.stage}"
-
-custom:
-  stage: ${opt:stage, 'dev'}
+    USERS_TABLE: ${sls:stage}-t_usuarios
+    MESSAGES_TABLE: ${sls:stage}-t_mensajes
+    CONNECTIONS_TABLE: ${sls:stage}-t_conexiones
 
 functions:
-  # ==========================================================
-  # 🧠 FUNCIONES HTTP (Usuarios)
-  # ==========================================================
   crearUsuario:
     handler: usuario/crear.handler
     events:
@@ -30,9 +22,6 @@ functions:
           path: /usuario/crear
           method: post
 
-  # ==========================================================
-  # 🔌 FUNCIONES WEBSOCKET
-  # ==========================================================
   connectHandler:
     handler: websocket/connect.handler
     events:
@@ -74,5 +63,17 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: messageId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    TablaConexiones:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.CONNECTIONS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: connectionId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: connectionId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
