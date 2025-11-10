@@ -1,16 +1,15 @@
-const AWS = require("aws-sdk");
+import AWS from 'aws-sdk';
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
-exports.handler = async (event) => {
-  const connectionId = event.requestContext.connectionId;
+export const handler = async (event) => {
+  const { connectionId } = event.requestContext;
 
-  await dynamo
-    .delete({
-      TableName: process.env.CONNECTIONS_TABLE,
-      Key: { connectionId },
-    })
-    .promise();
+  console.log('🔴 Cliente desconectado:', connectionId);
 
-  console.log("Desconectado:", connectionId);
-  return { statusCode: 200, body: "Desconectado" };
+  await dynamo.delete({
+    TableName: process.env.CONNECTIONS_TABLE,
+    Key: { connectionId },
+  }).promise();
+
+  return { statusCode: 200, body: 'Desconectado correctamente' };
 };

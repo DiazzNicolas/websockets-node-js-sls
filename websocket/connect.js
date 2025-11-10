@@ -1,16 +1,15 @@
-const AWS = require("aws-sdk");
+import AWS from 'aws-sdk';
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
-exports.handler = async (event) => {
-  const connectionId = event.requestContext.connectionId;
+export const handler = async (event) => {
+  const { connectionId } = event.requestContext;
 
-  await dynamo
-    .put({
-      TableName: process.env.CONNECTIONS_TABLE,
-      Item: { connectionId },
-    })
-    .promise();
+  console.log('🟢 Nueva conexión:', connectionId);
 
-  console.log("Conectado:", connectionId);
-  return { statusCode: 200, body: "Conectado" };
+  await dynamo.put({
+    TableName: process.env.CONNECTIONS_TABLE,
+    Item: { connectionId },
+  }).promise();
+
+  return { statusCode: 200, body: 'Conectado correctamente' };
 };

@@ -1,50 +1,62 @@
-const AWS = require("aws-sdk");
+import AWS from 'aws-sdk';
+import { v4 as uuidv4 } from 'uuid';
+
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
-exports.handler = async (event) => {
-  const body = JSON.parse(event.body || "{}");
-  const mensaje = body.mensaje || "";
-  const nombre = body.nombre || "Anónimo";
-  const connectionId = event.requestContext.connectionId;
+export const handler = async (event) => {
+  console.log('💬 Evento recibido:', event);
 
+  const { connectionId, domainName, stage } = event.requestContext;
+  const body = JSON.parse(event.body || '{}');
+  const { mensaje, usuario } = body;
+
+  if (!mensaje || !usuario) {
+    console.error('❌ Faltan datos en el mensaje');
+    return { statusCode: 400, body: 'Faltan campos requeridos' };
+  }
+
+  const messageItem = {
+    messageId: uuidv4(),
+    usuario,
+    mensaje,
+    fecha: new Date().toISOString(),
+  };
+
+  await dynamo.put({
+    TableName: process.env.MESSAGES_TABLE,
+    Item: messageItem,
+  }).promise();
+
+  // Inicializar cliente de WebSocket
   const api = new AWS.ApiGatewayManagementApi({
-    endpoint: event.requestContext.domainName + "/" + event.requestContext.stage,
+    endpoint: `${domainName}/${stage}`,
   });
 
-  // Obtener todas las conexiones
-  const conexiones = await dynamo
-    .scan({ TableName: process.env.CONNECTIONS_TABLE })
-    .promise();
+  const connections = await dynamo.scan({ TableName: process.env.CONNECTIONS_TABLE }).promise();
 
-  const payload = JSON.stringify({ nombre, mensaje });
+  console.log(`📡 Enviando mensaje a ${connections.Items.length} conexiones`);
 
-  // Enviar a todos los conectados
-  const envios = conexiones.Items.map(async (conn) => {
+  const sendPromises = connections.Items.map(async (conn) => {
     try {
       await api
         .postToConnection({
           ConnectionId: conn.connectionId,
-          Data: payload,
+          Data: JSON.stringify(messageItem),
         })
         .promise();
-    } catch (e) {
-      console.log("Error enviando a", conn.connectionId);
+    } catch (err) {
+      console.error('⚠️ Error enviando mensaje a conexión', conn.connectionId, err);
+      if (err.statusCode === 410) {
+        await dynamo.delete({
+          TableName: process.env.CONNECTIONS_TABLE,
+          Key: { connectionId: conn.connectionId },
+        }).promise();
+        console.log('🧹 Conexión eliminada:', conn.connectionId);
+      }
     }
   });
 
-  await Promise.all(envios);
+  await Promise.all(sendPromises);
 
-  // Guardar mensaje
-  await dynamo
-    .put({
-      TableName: process.env.MESSAGES_TABLE,
-      Item: {
-        messageId: Date.now().toString(),
-        nombre,
-        mensaje,
-      },
-    })
-    .promise();
-
-  return { statusCode: 200, body: "Mensaje enviado" };
+  return { statusCode: 200, body: 'Mensaje enviado correctamente' };
 };
