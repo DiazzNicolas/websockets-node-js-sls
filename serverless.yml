@@ -1,18 +1,23 @@
 org: nicolasdiaz
+app: api-chat
 service: api-chat
 
 provider:
   name: aws
   runtime: nodejs20.x
+  region: us-east-1
   memorySize: 1024
   timeout: 30
-  region: us-east-1
   iam:
     role: arn:aws:iam::730872172556:role/LabRole
   environment:
-    USERS_TABLE: ${sls:stage}-t_usuarios
-    MESSAGES_TABLE: ${sls:stage}-t_mensajes
+    USERS_TABLE: ${self:custom.stage}-t_usuarios
+    MESSAGES_TABLE: ${self:custom.stage}-t_mensajes
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    WEBSOCKET_API: !Sub "https://${WebsocketsApi}.execute-api.${AWS::Region}.amazonaws.com/${self:custom.stage}"
+
+custom:
+  stage: ${opt:stage, 'dev'}
 
 functions:
   # ==========================================================

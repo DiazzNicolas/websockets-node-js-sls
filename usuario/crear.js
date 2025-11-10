@@ -1,38 +1,36 @@
-const AWS = require('aws-sdk');
-const { v4: uuidv4 } = require('uuid');
+const AWS = require("aws-sdk");
+const { v4: uuidv4 } = require("uuid");
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
+  const body = JSON.parse(event.body || "{}");
+  const { nombre } = body;
+
+  if (!nombre) {
+    return { statusCode: 400, body: "El nombre es obligatorio" };
+  }
+
+  const userId = uuidv4();
+  const item = {
+    userId,
+    nombre,
+    createdAt: new Date().toISOString(),
+  };
+
   try {
-    const body = JSON.parse(event.body);
-    const { nombre } = body;
-
-    if (!nombre) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Falta el nombre del usuario' }),
-      };
-    }
-
-    const userId = uuidv4();
-    const newUser = { userId, nombre, createdAt: new Date().toISOString() };
-
     await dynamo
       .put({
         TableName: process.env.USERS_TABLE,
-        Item: newUser,
+        Item: item,
       })
       .promise();
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Usuario creado correctamente', user: newUser }),
+      body: JSON.stringify({ message: "Usuario creado", userId }),
     };
   } catch (error) {
-    console.error(error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Error al crear usuario' }),
-    };
+    console.error("Error al crear usuario:", error);
+    return { statusCode: 500, body: "Error al crear usuario" };
   }
 };

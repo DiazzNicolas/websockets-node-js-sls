@@ -1,42 +1,64 @@
-import AWS from "aws-sdk";
-import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
-import { v4 as uuidv4 } from "uuid";
+const AWS = require("aws-sdk");
+const { v4: uuidv4 } = require("uuid");
+const dynamo = new AWS.DynamoDB.DocumentClient();
 
-const apigw = new AWS.ApiGatewayManagementApi({
-  endpoint: process.env.WEBSOCKET_API, 
-});
-const db = new DynamoDBClient();
-
-export const handler = async (event) => {
+exports.handler = async (event) => {
   const { connectionId } = event.requestContext;
   const body = JSON.parse(event.body || "{}");
-  const { userId, mensaje } = body;
+  const { mensaje, userId } = body;
 
-  if (!userId || !mensaje)
-    return { statusCode: 400, body: "userId y mensaje son requeridos" };
+  if (!mensaje || !userId) {
+    return { statusCode: 400, body: "Faltan campos requeridos" };
+  }
 
   const messageId = uuidv4();
+  const item = {
+    messageId,
+    userId,
+    mensaje,
+    connectionId,
+    createdAt: new Date().toISOString(),
+  };
 
-  // Guardar mensaje en DynamoDB
-  await db.send(
-    new PutItemCommand({
-      TableName: process.env.MESSAGES_TABLE,
-      Item: {
-        messageId: { S: messageId },
-        userId: { S: userId },
-        mensaje: { S: mensaje },
-        fecha: { S: new Date().toISOString() },
-      },
-    })
-  );
+  try {
+    // Guardar mensaje
+    await dynamo
+      .put({
+        TableName: process.env.MESSAGES_TABLE,
+        Item: item,
+      })
+      .promise();
 
-  // Responder al cliente
-  await apigw
-    .postToConnection({
-      ConnectionId: connectionId,
-      Data: JSON.stringify({ ok: true, echo: mensaje }),
-    })
-    .promise();
+    // Obtener todas las conexiones
+    const conexiones = await dynamo
+      .scan({ TableName: process.env.USERS_TABLE })
+      .promise();
 
-  return { statusCode: 200, body: "Mensaje procesado" };
+    const api = new AWS.ApiGatewayManagementApi({
+      endpoint: event.requestContext.domainName + "/" + event.requestContext.stage,
+    });
+
+    // Enviar mensaje a todos los conectados
+    const payload = JSON.stringify({ userId, mensaje });
+
+    await Promise.all(
+      conexiones.Items.map(async (conn) => {
+        try {
+          await api
+            .postToConnection({
+              ConnectionId: conn.connectionId,
+              Data: payload,
+            })
+            .promise();
+        } catch (err) {
+          console.error("Error enviando mensaje a", conn.connectionId, err);
+        }
+      })
+    );
+
+    return { statusCode: 200, body: "Mensaje enviado" };
+  } catch (error) {
+    console.error("Error al procesar mensaje:", error);
+    return { statusCode: 500, body: "Error al guardar o enviar mensaje" };
+  }
 };
