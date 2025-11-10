@@ -27,6 +27,22 @@ provider:
         - execute-api:ManageConnections
       Resource: "*"
 
+  # 🔥 CORS habilitado globalmente para todas las rutas HTTP
+  httpApi:
+    cors:
+      allowedOrigins:
+        - "*"
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - OPTIONS
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      allowCredentials: false
+
 functions:
   crearUsuario:
     handler: usuario/crear.handler
