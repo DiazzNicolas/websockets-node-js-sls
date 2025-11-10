@@ -6,28 +6,28 @@ provider:
   runtime: nodejs20.x
   memorySize: 1024
   timeout: 30
+  region: us-east-1
   iam:
     role: arn:aws:iam::730872172556:role/LabRole
   environment:
     USERS_TABLE: ${sls:stage}-t_usuarios
     MESSAGES_TABLE: ${sls:stage}-t_mensajes
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
 
-# ==========================================================
-# 🧠 FUNCIONES HTTP (usuarios)
-# ==========================================================
 functions:
+  # ==========================================================
+  # 🧠 FUNCIONES HTTP (Usuarios)
+  # ==========================================================
   crearUsuario:
     handler: usuario/crear.handler
     events:
-      - http:
+      - httpApi:
           path: /usuario/crear
           method: post
-          cors: true
-          integration: lambda
 
-# ==========================================================
-# FUNCIONES WEBSOCKET
-# ==========================================================
+  # ==========================================================
+  # 🔌 FUNCIONES WEBSOCKET
+  # ==========================================================
   connectHandler:
     handler: websocket/connect.handler
     events:
@@ -46,9 +46,6 @@ functions:
       - websocket:
           route: sendMessage
 
-# ==========================================================
-# RECURSOS (DynamoDB)
-# ==========================================================
 resources:
   Resources:
     TablaUsuarios:

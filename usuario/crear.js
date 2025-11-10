@@ -1,36 +1,38 @@
-import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
-import { v4 as uuidv4 } from "uuid";
+const AWS = require('aws-sdk');
+const { v4: uuidv4 } = require('uuid');
+const dynamo = new AWS.DynamoDB.DocumentClient();
 
-const db = new DynamoDBClient();
-
-export const handler = async (event) => {
+exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
-    const { nombre, email } = body;
+    const { nombre } = body;
 
-    if (!nombre || !email) {
-      return { statusCode: 400, body: "Faltan campos requeridos" };
+    if (!nombre) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Falta el nombre del usuario' }),
+      };
     }
 
     const userId = uuidv4();
-    const params = {
-      TableName: process.env.USERS_TABLE,
-      Item: {
-        userId: { S: userId },
-        nombre: { S: nombre },
-        email: { S: email },
-        creadoEn: { S: new Date().toISOString() },
-      },
-    };
+    const newUser = { userId, nombre, createdAt: new Date().toISOString() };
 
-    await db.send(new PutItemCommand(params));
+    await dynamo
+      .put({
+        TableName: process.env.USERS_TABLE,
+        Item: newUser,
+      })
+      .promise();
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Usuario creado", userId }),
+      body: JSON.stringify({ message: 'Usuario creado correctamente', user: newUser }),
     };
-  } catch (err) {
-    console.error("Error creando usuario:", err);
-    return { statusCode: 500, body: "Error interno" };
+  } catch (error) {
+    console.error(error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Error al crear usuario' }),
+    };
   }
 };

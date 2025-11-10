@@ -1,7 +1,12 @@
 {
+  "name": "api-chat",
+  "version": "1.0.0",
+  "description": "Chat con WebSocket y DynamoDB usando Serverless Framework",
+  "main": "handler.js",
+  "author": "Nicolas Diaz",
+  "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.927.0",
-    "aws-sdk": "^2.1692.0",
-    "uuid": "^13.0.0"
+    "aws-sdk": "^2.1372.0",
+    "uuid": "^9.0.1"
   }
 }
