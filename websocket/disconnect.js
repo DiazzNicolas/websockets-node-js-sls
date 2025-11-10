@@ -1,15 +1,23 @@
-import AWS from 'aws-sdk';
-const dynamo = new AWS.DynamoDB.DocumentClient();
+import { DynamoDBClient, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
+
+const client = new DynamoDBClient({ region: "us-east-1" });
 
 export const handler = async (event) => {
-  const { connectionId } = event.requestContext;
+  console.log("❌ Cliente desconectado:", event.requestContext.connectionId);
 
-  console.log('🔴 Cliente desconectado:', connectionId);
+  try {
+    const params = {
+      TableName: process.env.CONNECTIONS_TABLE,
+      Key: {
+        connectionId: { S: event.requestContext.connectionId },
+      },
+    };
 
-  await dynamo.delete({
-    TableName: process.env.CONNECTIONS_TABLE,
-    Key: { connectionId },
-  }).promise();
+    await client.send(new DeleteItemCommand(params));
 
-  return { statusCode: 200, body: 'Desconectado correctamente' };
+    return { statusCode: 200, body: "Desconectado correctamente" };
+  } catch (error) {
+    console.error("❌ Error al desconectar:", error);
+    return { statusCode: 500, body: "Error al desconectar" };
+  }
 };

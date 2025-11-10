@@ -1,30 +1,57 @@
-import AWS from 'aws-sdk';
-import { v4 as uuidv4 } from 'uuid';
-const dynamo = new AWS.DynamoDB.DocumentClient();
+import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
+
+const client = new DynamoDBClient({ region: "us-east-1" });
 
 export const handler = async (event) => {
-  console.log('🧍 Creando usuario:', event.body);
+  console.log("📩 Evento recibido:", event);
 
-  const { nombre } = JSON.parse(event.body || '{}');
-  if (!nombre) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Falta el nombre de usuario' }) };
+  try {
+    const body = JSON.parse(event.body || "{}");
+    const { username } = body;
+
+    if (!username) {
+      return {
+        statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": true,
+        },
+        body: JSON.stringify({ message: "Falta el username" }),
+      };
+    }
+
+    const userId = Date.now().toString();
+
+    const params = {
+      TableName: process.env.USERS_TABLE,
+      Item: {
+        userId: { S: userId },
+        username: { S: username },
+      },
+    };
+
+    await client.send(new PutItemCommand(params));
+
+    console.log("✅ Usuario creado correctamente:", username);
+
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify({ userId, username }),
+    };
+  } catch (error) {
+    console.error("❌ Error al crear usuario:", error);
+
+    return {
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify({ message: "Error interno del servidor" }),
+    };
   }
-
-  const user = {
-    userId: uuidv4(),
-    nombre,
-    fechaRegistro: new Date().toISOString(),
-  };
-
-  await dynamo.put({
-    TableName: process.env.USERS_TABLE,
-    Item: user,
-  }).promise();
-
-  console.log('✅ Usuario creado:', user);
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ mensaje: 'Usuario creado correctamente', user }),
-  };
 };
