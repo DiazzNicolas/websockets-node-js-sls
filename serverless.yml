@@ -8,26 +8,11 @@ provider:
   iam:
     role: arn:aws:iam::730872172556:role/LabRole
   environment:
-    USERS_TABLE: ${sls:stage}-t_usuarios
-    MESSAGES_TABLE: ${sls:stage}-t_mensajes
-    CONNECTIONS_TABLE: ${sls:stage}-t_conexiones
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:PutItem
-        - dynamodb:GetItem
-        - dynamodb:Scan
-        - dynamodb:DeleteItem
-      Resource:
-        - arn:aws:dynamodb:${self:provider.region}:*:table/${sls:stage}-t_usuarios
-        - arn:aws:dynamodb:${self:provider.region}:*:table/${sls:stage}-t_mensajes
-        - arn:aws:dynamodb:${self:provider.region}:*:table/${sls:stage}-t_conexiones
-    - Effect: Allow
-      Action:
-        - execute-api:ManageConnections
-      Resource: "*"
+    USERS_TABLE: ${sls:stage}_t_usuarios
+    MESSAGES_TABLE: ${sls:stage}_t_mensajes
+    CONNECTIONS_TABLE: ${sls:stage}_t_conexiones
 
-  # 🔥 CORS habilitado globalmente para todas las rutas HTTP
+  # CORS habilitado globalmente
   httpApi:
     cors:
       allowedOrigins:
