@@ -8,11 +8,16 @@ provider:
   iam:
     role: arn:aws:iam::730872172556:role/LabRole
   environment:
+    # Tablas
     USERS_TABLE: ${sls:stage}_t_usuarios
-    MESSAGES_TABLE: ${sls:stage}_t_mensajes
+    ROOMS_TABLE: ${sls:stage}_t_salas
+    QUESTIONS_TABLE: ${sls:stage}_t_preguntas
+    GAME_SESSIONS_TABLE: ${sls:stage}_t_sesiones_juego
     CONNECTIONS_TABLE: ${sls:stage}_t_conexiones
+    
+    # WebSocket
+    WEBSOCKET_ENDPOINT: !Sub 'https://${WebsocketsApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}'
 
-  # CORS habilitado globalmente
   httpApi:
     cors:
       allowedOrigins:
@@ -26,9 +31,11 @@ provider:
         - POST
         - PUT
         - DELETE
-      allowCredentials: false
 
 functions:
+  # ==========================================
+  # USUARIOS
+  # ==========================================
   crearUsuario:
     handler: usuario/crear.handler
     events:
@@ -36,6 +43,173 @@ functions:
           path: /usuario/crear
           method: post
 
+  obtenerUsuario:
+    handler: usuario/obtener.handler
+    events:
+      - httpApi:
+          path: /usuario/{userId}
+          method: get
+
+  actualizarUsuario:
+    handler: usuario/actualizar.handler
+    events:
+      - httpApi:
+          path: /usuario/{userId}
+          method: put
+
+  # ==========================================
+  # SALAS
+  # ==========================================
+  crearSala:
+    handler: sala/crear.handler
+    events:
+      - httpApi:
+          path: /sala/crear
+          method: post
+
+  unirseASala:
+    handler: sala/unirse.handler
+    events:
+      - httpApi:
+          path: /sala/{roomId}/unirse
+          method: post
+
+  salirDeSala:
+    handler: sala/salir.handler
+    events:
+      - httpApi:
+          path: /sala/{roomId}/salir
+          method: post
+
+  listarSalas:
+    handler: sala/listar.handler
+    events:
+      - httpApi:
+          path: /salas/disponibles
+          method: get
+
+  obtenerSala:
+    handler: sala/obtener.handler
+    events:
+      - httpApi:
+          path: /sala/{roomId}
+          method: get
+
+  actualizarConfiguracion:
+    handler: sala/actualizarConfig.handler
+    events:
+      - httpApi:
+          path: /sala/{roomId}/configuracion
+          method: put
+
+  # ==========================================
+  # PREGUNTAS (Admin)
+  # ==========================================
+  crearPregunta:
+    handler: pregunta/crear.handler
+    events:
+      - httpApi:
+          path: /pregunta/crear
+          method: post
+
+  listarPreguntas:
+    handler: pregunta/listar.handler
+    events:
+      - httpApi:
+          path: /preguntas
+          method: get
+
+  listarPreguntasPorTopic:
+    handler: pregunta/listarPorTopic.handler
+    events:
+      - httpApi:
+          path: /preguntas/topic/{topic}
+          method: get
+
+  listarTopics:
+    handler: pregunta/listarTopics.handler
+    events:
+      - httpApi:
+          path: /preguntas/topics
+          method: get
+
+  eliminarPregunta:
+    handler: pregunta/eliminar.handler
+    events:
+      - httpApi:
+          path: /pregunta/{questionId}
+          method: delete
+
+  # ==========================================
+  # MECÁNICA DEL JUEGO
+  # ==========================================
+  iniciarPartida:
+    handler: juego/iniciarPartida.handler
+    events:
+      - httpApi:
+          path: /juego/{roomId}/iniciar
+          method: post
+
+  iniciarRonda:
+    handler: juego/iniciarRonda.handler
+    events:
+      - httpApi:
+          path: /juego/{sessionId}/ronda
+          method: post
+
+  enviarRespuesta:
+    handler: juego/enviarRespuesta.handler
+    events:
+      - httpApi:
+          path: /juego/{sessionId}/responder
+          method: post
+
+  finalizarFaseRespuestas:
+    handler: juego/finalizarFaseRespuestas.handler
+    events:
+      - httpApi:
+          path: /juego/{sessionId}/fase-respuestas/finalizar
+          method: post
+
+  enviarAdivinanza:
+    handler: juego/enviarAdivinanza.handler
+    events:
+      - httpApi:
+          path: /juego/{sessionId}/adivinar
+          method: post
+
+  finalizarFaseAdivinanzas:
+    handler: juego/finalizarFaseAdivinanzas.handler
+    events:
+      - httpApi:
+          path: /juego/{sessionId}/fase-adivinanzas/finalizar
+          method: post
+
+  obtenerEstadoPartida:
+    handler: juego/estado.handler
+    events:
+      - httpApi:
+          path: /juego/{sessionId}/estado
+          method: get
+
+  finalizarPartida:
+    handler: juego/finalizarPartida.handler
+    events:
+      - httpApi:
+          path: /juego/{sessionId}/finalizar
+          method: post
+
+  # NUEVO: Obtener ranking de una partida específica
+  obtenerRankingPartida:
+    handler: juego/rankingPartida.handler
+    events:
+      - httpApi:
+          path: /juego/{sessionId}/ranking
+          method: get
+
+  # ==========================================
+  # WEBSOCKET
+  # ==========================================
   connectHandler:
     handler: websocket/connect.handler
     events:
@@ -48,14 +222,23 @@ functions:
       - websocket:
           route: $disconnect
 
-  messageHandler:
-    handler: websocket/message.handler
+  defaultHandler:
+    handler: websocket/default.handler
     events:
       - websocket:
-          route: sendMessage
+          route: $default
+
+  gameEventHandler:
+    handler: websocket/gameEvent.handler
+    events:
+      - websocket:
+          route: gameEvent
 
 resources:
   Resources:
+    # ==========================================
+    # USUARIOS (SIMPLIFICADO - Sin estadísticas)
+    # ==========================================
     TablaUsuarios:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -67,19 +250,174 @@ resources:
           - AttributeName: userId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+        # Estructura SIMPLIFICADA:
+        # {
+        #   userId: "uuid-xxx",
+        #   nombre: "Juan",
+        #   email: "juan@example.com",      // Opcional (para auth)
+        #   avatarUrl: "https://...",
+        #   createdAt: "2025-11-11T10:00:00Z",
+        #   updatedAt: "2025-11-11T10:00:00Z"
+        # }
 
-    TablaMensajes:
+    # ==========================================
+    # SALAS
+    # ==========================================
+    TablaSalas:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.MESSAGES_TABLE}
+        TableName: ${self:provider.environment.ROOMS_TABLE}
         AttributeDefinitions:
-          - AttributeName: messageId
+          - AttributeName: roomId
+            AttributeType: S
+          - AttributeName: estado
+            AttributeType: S
+          - AttributeName: createdAt
             AttributeType: S
         KeySchema:
-          - AttributeName: messageId
+          - AttributeName: roomId
             KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: EstadoCreatedAtIndex
+            KeySchema:
+              - AttributeName: estado
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        TimeToLiveSpecification:
+          Enabled: true
+          AttributeName: ttl
         BillingMode: PAY_PER_REQUEST
+        # Estructura:
+        # {
+        #   roomId: "room-xxx",
+        #   nombre: "Sala de Juan",
+        #   hostUserId: "user-xxx",
+        #   jugadores: [
+        #     { userId: "user-1", nombre: "Juan", avatarUrl: "...", conectado: true },
+        #     { userId: "user-2", nombre: "Maria", avatarUrl: "...", conectado: true }
+        #   ],
+        #   maxJugadores: 8,
+        #   estado: "esperando", // esperando | en_juego | finalizada
+        #   configuracion: {
+        #     numeroPreguntas: 10,  // 10, 15 o 20
+        #     tiempoRespuesta: 150, // segundos (2.5min)
+        #     tiempoAdivinanza: 150,
+        #     puntosAdivinanzaCorrecta: 10,
+        #     topic: "cultura-general"
+        #   },
+        #   sessionId: "session-xxx", // cuando inicia la partida
+        #   createdAt: "2025-11-11T10:00:00Z",
+        #   ttl: 1234567890 // expira en 24h si no se usa
+        # }
 
+    # ==========================================
+    # PREGUNTAS
+    # ==========================================
+    TablaPreguntas:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.QUESTIONS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: questionId
+            AttributeType: S
+          - AttributeName: topic
+            AttributeType: S
+          - AttributeName: categoria
+            AttributeType: S
+        KeySchema:
+          - AttributeName: questionId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: TopicIndex
+            KeySchema:
+              - AttributeName: topic
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: CategoriaIndex
+            KeySchema:
+              - AttributeName: categoria
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+        # Estructura:
+        # {
+        #   questionId: "q-xxx",
+        #   texto: "¿Cuál es tu color favorito?",
+        #   topic: "cultura-general",
+        #   categoria: "preferencias", // preferencias | hipoteticas | personales
+        #   opciones: ["Rojo", "Azul", "Verde", "Amarillo"], // Siempre 4 opciones
+        #   activa: true,
+        #   vecesUsada: 145,
+        #   createdAt: "2025-11-11T10:00:00Z"
+        # }
+
+    # ==========================================
+    # SESIONES DE JUEGO (Estado de partida activa)
+    # ==========================================
+    TablaSesionesJuego:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.GAME_SESSIONS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: sessionId
+            AttributeType: S
+          - AttributeName: roomId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: sessionId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: RoomIdIndex
+            KeySchema:
+              - AttributeName: roomId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        TimeToLiveSpecification:
+          Enabled: true
+          AttributeName: ttl
+        BillingMode: PAY_PER_REQUEST
+        # Estructura:
+        # {
+        #   sessionId: "session-xxx",
+        #   roomId: "room-xxx",
+        #   topic: "cultura-general",
+        #   preguntasIds: ["q-1", "q-5", "q-12", ...],
+        #   rondaActual: 3,
+        #   preguntaActual: "q-12",
+        #   faseActual: "adivinando", // respondiendo | adivinando | finalizada
+        #   respuestas: {
+        #     "user-1": "Azul",
+        #     "user-2": "Rojo"
+        #   },
+        #   adivinanzas: {
+        #     "user-1": { target: "user-2", adivinanza: "Rojo" },
+        #     "user-2": { target: "user-1", adivinanza: "Verde" }
+        #   },
+        #   puntuaciones: {
+        #     "user-1": 45,
+        #     "user-2": 30
+        #   },
+        #   rankingActual: [
+        #     { userId: "user-2", nombre: "Maria", puntuacion: 30, avatarUrl: "..." },
+        #     { userId: "user-1", nombre: "Juan", puntuacion: 45, avatarUrl: "..." }
+        #   ],
+        #   historialRondas: [...],
+        #   tiempoInicioPartida: 1699876543210,
+        #   tiempoInicioRonda: 1699876600000,
+        #   estado: "activa", // activa | finalizada
+        #   createdAt: "2025-11-11T10:00:00Z",
+        #   ttl: 1234567890 // expira en 2h
+        # }
+
+    # ==========================================
+    # CONEXIONES WEBSOCKET
+    # ==========================================
     TablaConexiones:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -87,7 +425,63 @@ resources:
         AttributeDefinitions:
           - AttributeName: connectionId
             AttributeType: S
+          - AttributeName: roomId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
         KeySchema:
           - AttributeName: connectionId
             KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: RoomIdIndex
+            KeySchema:
+              - AttributeName: roomId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: UserIdIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        TimeToLiveSpecification:
+          Enabled: true
+          AttributeName: ttl
         BillingMode: PAY_PER_REQUEST
+
+# ==========================================
+# CAMBIOS PRINCIPALES:
+# ==========================================
+# 
+# ✅ ELIMINADO:
+#    - GET /usuarios/ranking (endpoint de ranking global)
+#    - GAME_HISTORY_TABLE (historial de partidas)
+#    - Campos de estadísticas en usuarios (puntuacionTotal, partidasJugadas, etc.)
+# 
+# ✅ AGREGADO:
+#    - GET /juego/{sessionId}/ranking (ranking de una partida específica)
+#    - Campo "rankingActual" en TablaSesionesJuego (se actualiza en tiempo real)
+# 
+# ✅ SIMPLIFICADO:
+#    - TablaUsuarios ahora solo tiene: userId, nombre, email, avatarUrl, createdAt
+#    - No hay persistencia de estadísticas históricas
+#    - El ranking existe SOLO durante la partida activa
+# 
+# ==========================================
+# FLUJO DEL RANKING:
+# ==========================================
+# 
+# 1. Durante la partida:
+#    - Cada vez que se actualizan puntuaciones, se recalcula "rankingActual"
+#    - Se ordena por puntuación descendente
+#    - Se envía por WebSocket a todos los jugadores
+# 
+# 2. Al finalizar:
+#    - GET /juego/{sessionId}/ranking devuelve el ranking final
+#    - El frontend muestra el podio/ganador
+# 
+# 3. Después de la partida:
+#    - La sesión expira (TTL de 2h)
+#    - No queda registro del ranking (juego casual)
+#

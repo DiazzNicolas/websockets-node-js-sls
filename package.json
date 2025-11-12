@@ -1,9 +1,32 @@
 {
-  "name": "api-chat",
+  "name": "api-chat-game",
   "version": "1.0.0",
+  "description": "API para juego de adivinanzas multijugador",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod",
+    "remove": "serverless remove",
+    "logs": "serverless logs -f",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint ."
+  },
   "type": "module",
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.x.x",
-    "@aws-sdk/client-apigatewaymanagementapi": "^3.x.x"
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.679.0",
+    "@aws-sdk/client-dynamodb": "^3.679.0",
+    "@aws-sdk/lib-dynamodb": "^3.679.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.3.3",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=20.x"
   }
 }
