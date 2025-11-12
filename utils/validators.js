@@ -146,6 +146,13 @@ export function validateUsername(username) {
 }
 
 /**
+ * Vacio
+ */
+export function isEmpty(value) {
+  return value === undefined || value === null || value === '' || 
+         (typeof value === 'string' && value.trim() === '');
+}
+/**
  * Validar email
  */
 export function validateEmail(email) {
