@@ -254,3 +254,4 @@ export const VALIDATION = {
     MAX_LENGTH: 100,
   },
 };
+export const ERRORS = ERROR_MESSAGES;
