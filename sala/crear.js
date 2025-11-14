@@ -1,12 +1,7 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { putItem, getItem } from '../utils/db.js';
 import { success, error, withErrorHandling } from '../utils/response.js';
 import { generateId } from '../utils/helpers.js';
 import { TABLES, GAME_STATUS, ERRORS } from '../utils/constants.js';
-
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
 
 /**
  * POST /sala/crear
@@ -41,7 +36,8 @@ export const handler = withErrorHandling(async (event) => {
   }
 
   // Verificar que el usuario existe
-  const usuario = await getItem(docClient, TABLES.USERS, { userId });
+  // ✅ CORREGIDO: Pasar el nombre de la tabla (string) en lugar del cliente
+  const usuario = await getItem(TABLES.USERS, { userId });
   if (!usuario) {
     return error('Usuario no encontrado', 404);
   }
@@ -69,7 +65,7 @@ export const handler = withErrorHandling(async (event) => {
 
   const sala = {
     roomId,
-    hostId: userId, // ✅ CAMBIO: hostUserId → hostId
+    hostId: userId,
     jugadores: [
       {
         userId: usuario.userId,
@@ -87,11 +83,12 @@ export const handler = withErrorHandling(async (event) => {
       topic
     },
     createdAt: timestamp,
-    updatedAt: timestamp, // ✅ AGREGADO
+    updatedAt: timestamp,
     ttl
   };
 
-  await putItem(docClient, TABLES.ROOMS, sala);
+  // ✅ CORREGIDO: Pasar el nombre de la tabla (string) en lugar del cliente
+  await putItem(TABLES.ROOMS, sala);
 
   console.log('✅ Sala creada:', roomId);
 
