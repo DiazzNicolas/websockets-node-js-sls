@@ -1,13 +1,14 @@
 // ==========================================
 // TABLAS DYNAMODB
 // ==========================================
+// Nombres de tablas según serverless.yml: ${sls:stage}_t_nombre
+// Ejemplo: dev_t_usuarios, prod_t_usuarios
 export const TABLES = {
-  USERS: process.env.USERS_TABLE,
-  ROOMS: process.env.ROOMS_TABLE,
-  QUESTIONS: process.env.QUESTIONS_TABLE,
-  GAME_SESSIONS: process.env.GAME_SESSIONS_TABLE,
-  CONNECTIONS: process.env.CONNECTIONS_TABLE,
-  GAME_HISTORY: process.env.GAME_HISTORY_TABLE,
+  USERS: process.env.USERS_TABLE || 'dev_t_usuarios',
+  ROOMS: process.env.ROOMS_TABLE || 'dev_t_salas',
+  QUESTIONS: process.env.QUESTIONS_TABLE || 'dev_t_preguntas',
+  GAME_SESSIONS: process.env.GAME_SESSIONS_TABLE || 'dev_t_sesiones_juego',
+  CONNECTIONS: process.env.CONNECTIONS_TABLE || 'dev_t_conexiones',
 };
 
 // ==========================================
@@ -46,6 +47,7 @@ export const ROOM_STATUS = {
 // ESTADOS DE SESIÓN DE JUEGO
 // ==========================================
 export const GAME_STATUS = {
+  WAITING: 'esperando', // ✅ AGREGADO: para el estado inicial de la sala
   ACTIVE: 'activa',
   FINISHED: 'finalizada',
 };
@@ -73,7 +75,7 @@ export const GAME_CONFIG = {
   // Tiempos (en segundos)
   DEFAULT_ANSWER_TIME: 150, // 2.5 minutos
   DEFAULT_GUESS_TIME: 150,
-  MIN_TIME: 60, // 1 minuto
+  MIN_TIME: 30, // ✅ CORREGIDO: era 60, debe ser 30 según tu validación
   MAX_TIME: 300, // 5 minutos
 
   // Puntuación
@@ -254,4 +256,5 @@ export const VALIDATION = {
     MAX_LENGTH: 100,
   },
 };
+
 export const ERRORS = ERROR_MESSAGES;
