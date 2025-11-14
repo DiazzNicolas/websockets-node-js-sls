@@ -1,6 +1,6 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { putItem, getItem, getCurrentTimestamp } from '../utils/db.js';
+import { putItem, getItem } from '../utils/db.js';
 import { success, error, withErrorHandling } from '../utils/response.js';
 import { generateId } from '../utils/helpers.js';
 import { TABLES, GAME_STATUS, ERRORS } from '../utils/constants.js';
@@ -15,24 +15,29 @@ const docClient = DynamoDBDocumentClient.from(client);
  * Body:
  * {
  *   userId: "user-xxx",      // ID del usuario que crea la sala (será el host)
- *   nombre: "Sala de Juan",  // Nombre de la sala (opcional)
- *   maxJugadores: 8,         // Máximo de jugadores (opcional, default: 8)
- *   configuracion: {         // Configuración del juego (opcional)
- *     numeroPreguntas: 10,
- *     tiempoRespuesta: 150,
- *     tiempoAdivinanza: 150,
- *     puntosAdivinanzaCorrecta: 10,
- *     topic: "cultura-general"
- *   }
+ *   maxJugadores: 4,         // Máximo de jugadores (opcional, default: 4)
+ *   numeroPreguntas: 10,     // Número de preguntas (opcional, default: 10)
+ *   tiempoRespuesta: 150,    // Tiempo de respuesta en segundos (opcional, default: 150)
+ *   tiempoAdivinanza: 150,   // Tiempo de adivinanza en segundos (opcional, default: 150)
+ *   puntosAdivinanzaCorrecta: 10, // Puntos por adivinanza correcta (opcional, default: 10)
+ *   topic: "cultura-general" // Tema de las preguntas (opcional, default: "cultura-general")
  * }
  */
 export const handler = withErrorHandling(async (event) => {
   const body = JSON.parse(event.body || '{}');
-  const { userId, nombre, maxJugadores = 8, configuracion = {} } = body;
+  const { 
+    userId, 
+    maxJugadores = 4,
+    numeroPreguntas = 10,
+    tiempoRespuesta = 150,
+    tiempoAdivinanza = 150,
+    puntosAdivinanzaCorrecta = 10,
+    topic = 'cultura-general'
+  } = body;
 
   // Validaciones
   if (!userId) {
-    return error(ERRORS.MISSING_FIELDS('userId'), 400);
+    return error('El campo userId es obligatorio', 400);
   }
 
   // Verificar que el usuario existe
@@ -41,18 +46,8 @@ export const handler = withErrorHandling(async (event) => {
     return error('Usuario no encontrado', 404);
   }
 
-  // Configuración por defecto
-  const configDefault = {
-    numeroPreguntas: 10,
-    tiempoRespuesta: 150,
-    tiempoAdivinanza: 150,
-    puntosAdivinanzaCorrecta: 10,
-    topic: 'cultura-general',
-    ...configuracion
-  };
-
   // Validar configuración
-  if (![10, 15, 20].includes(configDefault.numeroPreguntas)) {
+  if (![10, 15, 20].includes(numeroPreguntas)) {
     return error('numeroPreguntas debe ser 10, 15 o 20', 400);
   }
 
@@ -60,31 +55,45 @@ export const handler = withErrorHandling(async (event) => {
     return error('maxJugadores debe estar entre 2 y 8', 400);
   }
 
+  if (tiempoRespuesta < 30 || tiempoRespuesta > 300) {
+    return error('tiempoRespuesta debe estar entre 30 y 300 segundos', 400);
+  }
+
+  if (tiempoAdivinanza < 30 || tiempoAdivinanza > 300) {
+    return error('tiempoAdivinanza debe estar entre 30 y 300 segundos', 400);
+  }
+
   const roomId = generateId('room');
-  const timestamp = getCurrentTimestamp();
+  const timestamp = new Date().toISOString();
   const ttl = Math.floor(Date.now() / 1000) + (24 * 60 * 60); // 24 horas
 
   const sala = {
     roomId,
-    nombre: nombre || `Sala de ${usuario.nombre}`,
-    hostUserId: userId,
+    hostId: userId, // ✅ CAMBIO: hostUserId → hostId
     jugadores: [
       {
         userId: usuario.userId,
         nombre: usuario.nombre,
         avatarUrl: usuario.avatarUrl || '',
-        conectado: true
       }
     ],
     maxJugadores,
     estado: GAME_STATUS.WAITING,
-    configuracion: configDefault,
-    sessionId: null,
+    configuracion: {
+      numeroPreguntas,
+      tiempoRespuesta,
+      tiempoAdivinanza,
+      puntosAdivinanzaCorrecta,
+      topic
+    },
     createdAt: timestamp,
+    updatedAt: timestamp, // ✅ AGREGADO
     ttl
   };
 
   await putItem(docClient, TABLES.ROOMS, sala);
+
+  console.log('✅ Sala creada:', roomId);
 
   return success({
     message: 'Sala creada exitosamente',
