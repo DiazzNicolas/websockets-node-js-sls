@@ -37,20 +37,23 @@ export const handler = withErrorHandling(async (event) => {
     sala.jugadores.length < sala.maxJugadores
   );
 
-  // Formatear respuesta con información resumida
-  const salasFormateadas = salasDisponibles.map(sala => ({
-    roomId: sala.roomId,
-    nombre: sala.nombre,
-    hostUserId: sala.hostUserId,
-    hostNombre: sala.jugadores.find(j => j.userId === sala.hostUserId)?.nombre || 'Host',
-    jugadoresActuales: sala.jugadores.length,
-    maxJugadores: sala.maxJugadores,
-    configuracion: {
-      numeroPreguntas: sala.configuracion.numeroPreguntas,
-      topic: sala.configuracion.topic
-    },
-    createdAt: sala.createdAt
-  }));
+  // Formatear respuesta - devolver la sala completa tal como está
+  const salasFormateadas = salasDisponibles.map(sala => {
+    // Encontrar el host
+    const host = sala.jugadores.find(j => j.userId === sala.hostId);
+    
+    return {
+      roomId: sala.roomId,
+      hostId: sala.hostId, // Cambiar hostUserId a hostId
+      hostNombre: host?.nombre || 'Host',
+      jugadores: sala.jugadores,
+      maxJugadores: sala.maxJugadores,
+      estado: sala.estado,
+      configuracion: sala.configuracion,
+      createdAt: sala.createdAt,
+      updatedAt: sala.updatedAt
+    };
+  });
 
   return success({
     salas: salasFormateadas,
