@@ -33,33 +33,50 @@ const dynamoDB = DynamoDBDocumentClient.from(client, {
 });
 
 // ============================
+// VALIDACIÓN
+// ============================
+function validateTableName(tableName) {
+  if (!tableName || typeof tableName !== 'string') {
+    throw new Error(`TableName inválido: se esperaba un string, se recibió ${typeof tableName} - Valor: ${JSON.stringify(tableName)}`);
+  }
+}
+
+// ============================
 // OPERACIONES BÁSICAS
 // ============================
 
 export async function getItem(tableName, key) {
   try {
+    validateTableName(tableName);
+    
     const command = new GetCommand({ TableName: tableName, Key: key });
     const response = await dynamoDB.send(command);
     return response.Item || null;
   } catch (error) {
     console.error('Error en getItem:', error);
+    console.error('TableName recibido:', tableName, 'Tipo:', typeof tableName);
     throw error;
   }
 }
 
 export async function putItem(tableName, item) {
   try {
+    validateTableName(tableName);
+    
     const command = new PutCommand({ TableName: tableName, Item: item });
     await dynamoDB.send(command);
     return item;
   } catch (error) {
     console.error('Error en putItem:', error);
+    console.error('TableName recibido:', tableName, 'Tipo:', typeof tableName);
     throw error;
   }
 }
 
 export async function updateItem(tableName, key, updates, conditions = {}) {
   try {
+    validateTableName(tableName);
+    
     const updateExpressions = [];
     const expressionAttributeNames = {};
     const expressionAttributeValues = {};
@@ -96,23 +113,29 @@ export async function updateItem(tableName, key, updates, conditions = {}) {
     return response.Attributes;
   } catch (error) {
     console.error('Error en updateItem:', error);
+    console.error('TableName recibido:', tableName, 'Tipo:', typeof tableName);
     throw error;
   }
 }
 
 export async function deleteItem(tableName, key) {
   try {
+    validateTableName(tableName);
+    
     const command = new DeleteCommand({ TableName: tableName, Key: key });
     await dynamoDB.send(command);
     return true;
   } catch (error) {
     console.error('Error en deleteItem:', error);
+    console.error('TableName recibido:', tableName, 'Tipo:', typeof tableName);
     throw error;
   }
 }
 
 export async function query(tableName, keyCondition, options = {}) {
   try {
+    validateTableName(tableName);
+    
     const params = {
       TableName: tableName,
       KeyConditionExpression: keyCondition.expression,
@@ -139,12 +162,15 @@ export async function query(tableName, keyCondition, options = {}) {
     return response.Items || [];
   } catch (error) {
     console.error('Error en query:', error);
+    console.error('TableName recibido:', tableName, 'Tipo:', typeof tableName);
     throw error;
   }
 }
 
 export async function scan(tableName, options = {}) {
   try {
+    validateTableName(tableName);
+    
     const params = { TableName: tableName };
 
     if (options.filterExpression) {
@@ -161,12 +187,15 @@ export async function scan(tableName, options = {}) {
     return response.Items || [];
   } catch (error) {
     console.error('Error en scan:', error);
+    console.error('TableName recibido:', tableName, 'Tipo:', typeof tableName);
     throw error;
   }
 }
 
 export async function batchGet(tableName, keys) {
   try {
+    validateTableName(tableName);
+    
     if (keys.length === 0) return [];
 
     const chunks = chunkArray(keys, 100);
@@ -184,12 +213,15 @@ export async function batchGet(tableName, keys) {
     return allItems;
   } catch (error) {
     console.error('Error en batchGet:', error);
+    console.error('TableName recibido:', tableName, 'Tipo:', typeof tableName);
     throw error;
   }
 }
 
 export async function batchWrite(tableName, items, operation = 'put') {
   try {
+    validateTableName(tableName);
+    
     if (items.length === 0) return true;
 
     const chunks = chunkArray(items, 25);
@@ -210,6 +242,7 @@ export async function batchWrite(tableName, items, operation = 'put') {
     return true;
   } catch (error) {
     console.error('Error en batchWrite:', error);
+    console.error('TableName recibido:', tableName, 'Tipo:', typeof tableName);
     throw error;
   }
 }
