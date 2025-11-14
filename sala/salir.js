@@ -1,11 +1,6 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { getItem, updateItem, deleteItem, getCurrentTimestamp } from '../utils/db.js';
 import { success, error, withErrorHandling } from '../utils/response.js';
-import { TABLES, GAME_STATUS, ERRORS } from '../utils/constants.js';
-
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+import { TABLES } from '../utils/constants.js';
 
 /**
  * POST /sala/{roomId}/salir
@@ -23,11 +18,11 @@ export const handler = withErrorHandling(async (event) => {
 
   // Validaciones
   if (!roomId || !userId) {
-    return error(ERRORS.MISSING_FIELDS('roomId, userId'), 400);
+    return error('roomId y userId son obligatorios', 400);
   }
 
   // Obtener sala
-  const sala = await getItem(docClient, TABLES.ROOMS, { roomId });
+  const sala = await getItem(TABLES.ROOMS, { roomId });
   if (!sala) {
     return error('Sala no encontrada', 404);
   }
@@ -43,7 +38,7 @@ export const handler = withErrorHandling(async (event) => {
 
   // Si la sala queda vacía, eliminarla
   if (jugadoresActualizados.length === 0) {
-    await deleteItem(docClient, TABLES.ROOMS, { roomId });
+    await deleteItem(TABLES.ROOMS, { roomId });
     
     return success({
       message: 'Has salido de la sala. La sala fue eliminada porque quedó vacía',
@@ -52,29 +47,29 @@ export const handler = withErrorHandling(async (event) => {
   }
 
   // Si el host se va, asignar nuevo host (el primer jugador restante)
-  let nuevoHostUserId = sala.hostUserId;
-  if (sala.hostUserId === userId) {
-    nuevoHostUserId = jugadoresActualizados[0].userId;
+  // ⚠️ IMPORTANTE: Tu esquema usa "hostId", no "hostUserId"
+  let nuevoHostId = sala.hostId;
+  if (sala.hostId === userId) {
+    nuevoHostId = jugadoresActualizados[0].userId;
   }
 
   // Actualizar sala
   await updateItem(
-    docClient,
     TABLES.ROOMS,
     { roomId },
     {
       jugadores: jugadoresActualizados,
-      hostUserId: nuevoHostUserId,
+      hostId: nuevoHostId, // ✅ Cambiado de hostUserId a hostId
       updatedAt: getCurrentTimestamp()
     }
   );
 
   // Obtener sala actualizada
-  const salaActualizada = await getItem(docClient, TABLES.ROOMS, { roomId });
+  const salaActualizada = await getItem(TABLES.ROOMS, { roomId });
 
   return success({
     message: 'Has salido de la sala exitosamente',
-    nuevoHost: sala.hostUserId === userId ? nuevoHostUserId : null,
+    nuevoHost: sala.hostId === userId ? nuevoHostId : null,
     sala: salaActualizada
   });
 });
