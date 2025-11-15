@@ -167,6 +167,32 @@ export async function query(tableName, keyCondition, options = {}) {
   }
 }
 
+// ============================
+// NUEVA FUNCIÓN: queryItems
+// Compatible con el formato usado en gameEvent.js
+// ============================
+export async function queryItems(tableName, params) {
+  try {
+    validateTableName(tableName);
+    
+    const command = new QueryCommand({
+      TableName: tableName,
+      ...params
+    });
+    
+    const response = await dynamoDB.send(command);
+    return {
+      items: response.Items || [],
+      count: response.Count || 0,
+      lastEvaluatedKey: response.LastEvaluatedKey
+    };
+  } catch (error) {
+    console.error('Error en queryItems:', error);
+    console.error('TableName recibido:', tableName, 'Tipo:', typeof tableName);
+    throw error;
+  }
+}
+
 export async function scan(tableName, options = {}) {
   try {
     validateTableName(tableName);
