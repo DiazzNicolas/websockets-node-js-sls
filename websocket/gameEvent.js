@@ -1,42 +1,26 @@
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi';
-import { getItem, queryItems } from '../utils/db.js';
+import { getItem, queryItems, deleteItem } from '../utils/db.js';
 import { TABLES } from '../utils/constants.js';
 
-/**
- * WebSocket: gameEvent
- * Maneja eventos del juego y notifica a los jugadores
- * 
- * Tipos de eventos soportados:
- * - playerJoined: Un jugador se unió a la sala
- * - playerLeft: Un jugador salió de la sala
- * - gameStarted: La partida comenzó
- * - roundStarted: Nueva ronda iniciada
- * - playerAnswered: Un jugador respondió
- * - guessPhaseStarted: Fase de adivinanzas comenzó
- * - playerGuessed: Un jugador adivinó
- * - roundEnded: Ronda finalizada con resultados
- * - gameEnded: Partida finalizada
- * - chatMessage: Mensaje de chat
- */
 export const handler = async (event) => {
   try {
     const connectionId = event.requestContext.connectionId;
     const body = JSON.parse(event.body || '{}');
-    const { action, data } = body;
+    const { data } = body; // El "action" ya se usó para rutear a "gameEvent"
 
-    console.log('Game event recibido:', { connectionId, action, data });
+    console.log('Game event recibido:', { connectionId, data });
 
     // Validar estructura del mensaje
-    if (!action || !data || !data.roomId) {
+    if (!data || !data.roomId || !data.action) {
       return {
         statusCode: 400,
         body: JSON.stringify({ 
-          error: 'Se requiere "action" y "data.roomId"' 
+          error: 'Se requiere "data.action" y "data.roomId"' 
         })
       };
     }
 
-    const { roomId } = data;
+    const { roomId, action: eventType } = data;
 
     // Obtener todas las conexiones de la sala
     const conexionesResult = await queryItems(
@@ -64,15 +48,17 @@ export const handler = async (event) => {
 
     // Preparar el mensaje para enviar
     const mensaje = {
-      event: action,
+      event: eventType,
       data: {
         ...data,
         timestamp: new Date().toISOString()
       }
     };
 
-    // Configurar cliente de API Gateway Management
-    const endpoint = process.env.WEBSOCKET_ENDPOINT.replace('wss://', 'https://');
+    // Configurar cliente de API Gateway Management - ESTO ES LO IMPORTANTE
+    const endpoint = `https://${event.requestContext.domainName}/${event.requestContext.stage}`;
+    console.log('Endpoint WebSocket:', endpoint);
+    
     const apiGateway = new ApiGatewayManagementApiClient({
       endpoint
     });
@@ -96,7 +82,6 @@ export const handler = async (event) => {
         if (error.statusCode === 410) {
           console.log('Conexión obsoleta, eliminando:', conexion.connectionId);
           try {
-            const { deleteItem } = await import('../utils/db.js');
             await deleteItem(TABLES.CONNECTIONS, { 
               connectionId: conexion.connectionId 
             });
@@ -123,7 +108,7 @@ export const handler = async (event) => {
       statusCode: 200,
       body: JSON.stringify({
         message: 'Evento enviado',
-        action,
+        action: eventType,
         roomId,
         estadisticas: {
           conexionesActivas: conexiones.length,
@@ -138,7 +123,8 @@ export const handler = async (event) => {
     return {
       statusCode: 500,
       body: JSON.stringify({ 
-        error: 'Error al procesar evento del juego' 
+        error: 'Error al procesar evento del juego',
+        details: error.message
       })
     };
   }
