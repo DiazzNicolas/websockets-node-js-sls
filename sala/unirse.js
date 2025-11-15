@@ -1,11 +1,6 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { getItem, updateItem, getCurrentTimestamp } from '../utils/db.js';
 import { success, error, withErrorHandling } from '../utils/response.js';
 import { TABLES, GAME_STATUS, ERRORS } from '../utils/constants.js';
-
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
 
 /**
  * POST /sala/{roomId}/unirse
@@ -26,8 +21,8 @@ export const handler = withErrorHandling(async (event) => {
     return error(ERRORS.MISSING_FIELDS('roomId, userId'), 400);
   }
 
-  // Obtener sala
-  const sala = await getItem(docClient, TABLES.ROOMS, { roomId });
+  // Obtener sala - ✅ SIN docClient
+  const sala = await getItem(TABLES.ROOMS, { roomId });
   if (!sala) {
     return error('Sala no encontrada', 404);
   }
@@ -37,20 +32,22 @@ export const handler = withErrorHandling(async (event) => {
     return error('No puedes unirte a una sala que ya está en juego o finalizada', 400);
   }
 
-  // Verificar que el usuario existe
-  const usuario = await getItem(docClient, TABLES.USERS, { userId });
+  // Verificar que el usuario existe - ✅ SIN docClient
+  const usuario = await getItem(TABLES.USERS, { userId });
   if (!usuario) {
     return error('Usuario no encontrado', 404);
   }
 
   // Verificar si el usuario ya está en la sala
-  const yaEstaEnSala = sala.jugadores.some(j => j.userId === userId);
+  const jugadores = sala.jugadores || []; // ✅ Protección contra undefined
+  const yaEstaEnSala = jugadores.some(j => j.userId === userId);
+  
   if (yaEstaEnSala) {
     return error('El usuario ya está en esta sala', 400);
   }
 
   // Verificar capacidad
-  if (sala.jugadores.length >= sala.maxJugadores) {
+  if (jugadores.length >= sala.maxJugadores) {
     return error('La sala está llena', 400);
   }
 
@@ -62,10 +59,10 @@ export const handler = withErrorHandling(async (event) => {
     conectado: true
   };
 
-  const jugadoresActualizados = [...sala.jugadores, nuevoJugador];
+  const jugadoresActualizados = [...jugadores, nuevoJugador];
 
+  // Actualizar sala - ✅ SIN docClient
   await updateItem(
-    docClient,
     TABLES.ROOMS,
     { roomId },
     {
@@ -74,8 +71,8 @@ export const handler = withErrorHandling(async (event) => {
     }
   );
 
-  // Obtener sala actualizada
-  const salaActualizada = await getItem(docClient, TABLES.ROOMS, { roomId });
+  // Obtener sala actualizada - ✅ SIN docClient
+  const salaActualizada = await getItem(TABLES.ROOMS, { roomId });
 
   return success({
     message: 'Te has unido a la sala exitosamente',
